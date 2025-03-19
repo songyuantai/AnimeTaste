@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35828.75 d17.13
+VisualStudioVersion = 17.13.35828.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeTaste", "AnimeTaste.csproj", "{73FD8890-A082-4C9D-BFBF-22804D69A51D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeTaste.WebApi", "..\AnimeTaste.WebApi\AnimeTaste.WebApi.csproj", "{7654D331-7DEB-4C36-ADF5-B9E78A18D358}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{73FD8890-A082-4C9D-BFBF-22804D69A51D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73FD8890-A082-4C9D-BFBF-22804D69A51D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73FD8890-A082-4C9D-BFBF-22804D69A51D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7654D331-7DEB-4C36-ADF5-B9E78A18D358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7654D331-7DEB-4C36-ADF5-B9E78A18D358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7654D331-7DEB-4C36-ADF5-B9E78A18D358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7654D331-7DEB-4C36-ADF5-B9E78A18D358}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

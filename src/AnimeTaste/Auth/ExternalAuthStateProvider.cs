@@ -34,13 +34,7 @@ namespace AnimeTaste.Auth
 
         private Task<ClaimsPrincipal> LoginWithExternalProviderAsync()
         {
-            /*
-                Provide OpenID/MSAL code to authenticate the user. See your identity 
-                provider's documentation for details.
-
-                Return a new ClaimsPrincipal based on a new ClaimsIdentity.
-            */
-            var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity());
+             var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity());
 
             return Task.FromResult(authenticatedUser);
         }

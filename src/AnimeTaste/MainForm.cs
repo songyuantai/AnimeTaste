@@ -18,6 +18,7 @@ namespace AnimeTaste
             var services = new ServiceCollection();
             services.AddWindowsFormsBlazorWebView();
             services.AddBlazorWebViewDeveloperTools();
+            services.AddAntDesign();
 
             mainBlazorWebView.HostPage = "wwwroot\\index.html";
 
@@ -34,7 +35,7 @@ namespace AnimeTaste
                         UrlLoadingStrategy.OpenInWebView;
                 }
             };
-            mainBlazorWebView.RootComponents.Add<Counter>("#app");
+            mainBlazorWebView.RootComponents.Add<App>("#app");
 
         }
     }

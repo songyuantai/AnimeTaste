@@ -1,0 +1,10 @@
+﻿#app .logo {
+    height: 32px;
+    color:#fff;
+    margin: 16px;
+    text-align:center;
+}
+
+.site-layout .site-layout-background {
+    background: #fff;
+}
