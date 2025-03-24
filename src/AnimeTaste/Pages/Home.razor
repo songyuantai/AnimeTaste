@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = AnimeTaste.Core.Const.Policy.ADD_ROLE)]
 <h3>Home</h3>
 
 @code {

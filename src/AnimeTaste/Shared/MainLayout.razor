@@ -27,14 +27,34 @@
     </Sider>
     <Layout Class="site-layout">
         <Header Class="site-layout-background" Style="padding: 0;">
-            @if (collapsed)
-            {
-                <Icon Type="menu-unfold" Theme="IconThemeType.Outline" Class="trigger" OnClick="toggle" Style="margin-left:15px;"/>
-            }
-            else
-            {
-                <Icon Type="menu-fold" Theme="IconThemeType.Outline" Class="trigger" OnClick="toggle" Style="margin-left:15px;" />
-            }
+
+
+            <div style="display:flex;justify-content:space-between">
+                <div>
+                    @if (collapsed)
+                    {
+                        <Icon Type="menu-unfold" Theme="IconThemeType.Outline" Class="trigger" OnClick="toggle" Style="margin-left:15px;"/>
+                    }
+                    else
+                    {
+                        <Icon Type="menu-fold" Theme="IconThemeType.Outline" Class="trigger" OnClick="toggle" Style="margin-left:15px;" />
+                    }
+                </div>
+                <div style="padding:0 15px;">
+                    <AuthorizeView>
+                        <Authorized>
+                            <a href="/logoff">注销</a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a href="/account/login">登录</a>
+                            &nbsp;
+                            <a href="/account/">注册</a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+           
+
         </Header>
         <Content Class="site-layout-background" Style="margin: 24px 16px;padding: 24px;min-height: 280px;">
             @Body

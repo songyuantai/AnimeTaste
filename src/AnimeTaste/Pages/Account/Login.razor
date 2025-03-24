@@ -1,0 +1,82 @@
+﻿@page "/account/login"
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json;
+@using System.ComponentModel;
+@using AnimeTaste.Auth;
+@using Microsoft.AspNetCore.Components.Forms;
+@inject AuthenticationStateProvider authenticationStateProvider;
+@inject IMessageService message;
+@inject NavigationManager navigationManager;
+
+<div>
+    <GridRow>
+        <GridCol Span="12" Offset="6" Style="padding-top: 20vh;">
+            <Form Model="@model"
+            OnFinish="OnFinish"
+            OnFinishFailed="OnFinishFailed"
+            LabelColSpan="8"
+            WrapperColSpan="16">
+                <FormItem Label="用户名">
+                    <Input @bind-Value="@context.UserNo" />
+                </FormItem>
+                <FormItem Label="密码">
+                    <InputPassword @bind-Value="@context.Password" />
+                </FormItem>
+                <FormItem WrapperColOffset="8" WrapperColSpan="16">
+                    <Button Type="@ButtonType.Primary" HtmlType="submit">
+                        登录
+                    </Button>
+                </FormItem>
+            </Form>
+        </GridCol>
+    </GridRow>
+</div>
+
+
+
+@code
+{
+    public class Model
+    {
+        [Required]
+        public string? UserNo { get; set; }
+
+        [Required]
+        public string? Password { get; set; }
+    }
+
+    private Model model = new Model();
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        if (string.IsNullOrEmpty(model.UserNo))
+        {
+            await message.Error("请输入用户名！");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(model.Password))
+        {
+            await message.Error("请输入密码！");
+            return;
+        }
+
+        var provider = authenticationStateProvider as ExternalAuthStateProvider;
+
+        var result = await provider!.LogInAsync(model.UserNo, model.Password);
+
+        if (result!.IsSuccess)
+        {
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            await message.Error(result!.Message);
+        }
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
+    }
+}

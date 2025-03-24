@@ -49,6 +49,7 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "AnimeTaste";
+            Load += MainForm_Load;
             ResumeLayout(false);
         }
 

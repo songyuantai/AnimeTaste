@@ -1,11 +1,14 @@
 using AnimeTaste.Auth;
+using AnimeTaste.Core;
+using AnimeTaste.Core.Const;
+using AnimeTaste.Service;
+using AnimeTaste.WebApi;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using System.Security.Claims;
 
 namespace AnimeTaste
 {
@@ -16,16 +19,28 @@ namespace AnimeTaste
             InitializeComponent();
 
             var services = new ServiceCollection();
+            services.AddOptions();
             services.AddWindowsFormsBlazorWebView();
             services.AddBlazorWebViewDeveloperTools();
             services.AddAntDesign();
 
             mainBlazorWebView.HostPage = "wwwroot\\index.html";
 
-            services.AddAuthorizationCore();
-            services.TryAddScoped<AuthenticationStateProvider, ExternalAuthStateProvider>();
-            mainBlazorWebView.Services = services.BuildServiceProvider();
+            services.AddBlazoredLocalStorage();
 
+            services.AddAuthorizationCore(op =>
+            {
+                Policy.GetPolicyList().ForEach(policy => op.AddPolicy(policy, m => m.RequireClaim(policy, "true")));
+            });
+            services.TryAddScoped<AuthenticationStateProvider, ExternalAuthStateProvider>();
+            services.AddCascadingAuthenticationState();
+            services.AddSugarSql("server=localhost;userid=root;password=root;database=anime;AllowLoadLocalInfile=true");
+            services.AddSysServices();
+            services.AddCoreServices();
+            services.AddScoped<ApiClient>();
+
+            mainBlazorWebView.Services = services.BuildServiceProvider();
+            Core.App.SetProvider(mainBlazorWebView.Services);
 
             mainBlazorWebView.UrlLoading += (sender, urlLoadingEventArgs) =>
             {
@@ -36,6 +51,19 @@ namespace AnimeTaste
                 }
             };
             mainBlazorWebView.RootComponents.Add<App>("#app");
+
+
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            BeginInvoke(() =>
+            {
+                //var maintain = mainBlazorWebView.Services.GetService<DbMaintainService>();
+                // maintain?.DropTables();
+                //maintain?.InitTables();
+                //maintain?.SeedData();
+            });
 
         }
     }
