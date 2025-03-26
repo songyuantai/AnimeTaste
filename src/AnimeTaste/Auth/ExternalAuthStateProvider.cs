@@ -1,15 +1,15 @@
-﻿using AnimeTaste.Core.Model;
+﻿using AnimeTaste.Client;
+using AnimeTaste.Core.Model;
 using AnimeTaste.WebApi;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.JSInterop;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace AnimeTaste.Auth
 {
     public class ExternalAuthStateProvider(
-        IJSRuntime js,
+        JsService js,
         ApiClient client) : AuthenticationStateProvider
     {
 
@@ -32,9 +32,9 @@ namespace AnimeTaste.Auth
             if (null != loginOut && null != loginOut.Data && loginOut.IsSuccess)
             {
                 var token = loginOut!.Data!.Token ?? "";
-                await js.InvokeAsync<string>("localStorage.setItem", ApiClient.AUTH_KEY, token);
+                await js.SetLocalStorageAsync(ApiClient.AUTH_KEY, token);
                 var claims = ParseToken(token);
-                var identity = new ClaimsIdentity(claims);
+                var identity = new ClaimsIdentity(claims, "Bearer");
                 currentUser = new ClaimsPrincipal(identity);
                 return await Task.FromResult(new AuthenticationState(currentUser));
             }
@@ -47,7 +47,7 @@ namespace AnimeTaste.Auth
 
         public async Task Logout()
         {
-            await js.InvokeAsync<string>("localStorage.removeItem", ApiClient.AUTH_KEY);
+            await js.RemoveLocalStorageAsync(ApiClient.AUTH_KEY);
             currentUser = new ClaimsPrincipal(new ClaimsIdentity());
             NotifyAuthenticationStateChanged(
                 Task.FromResult(new AuthenticationState(currentUser)));

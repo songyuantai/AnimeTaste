@@ -1,0 +1,55 @@
+﻿@page "/anime_schedule"
+<Tabs @bind-ActiveKey="@activeKey" OnChange="OnTabChange" Animated>
+
+    <ChildContent>
+        <TabPane Tab="周一" Key="1">
+            周一
+        </TabPane>
+        <TabPane Tab="周二" Key="2">
+            周二
+        </TabPane>
+        <TabPane Tab="周三 3" Key="3">
+            周三
+        </TabPane>
+        <TabPane Tab="周四 3" Key="4">
+            周四
+        </TabPane>
+        <TabPane Tab="周五" Key="5">
+            周五
+        </TabPane>
+        <TabPane Tab="周六" Key="6">
+            周六
+        </TabPane>
+        <TabPane Tab="周日" Key="7">
+            周日
+        </TabPane>
+    </ChildContent>
+    <TabBarExtraContent>
+        <InputGroup Compact>
+            <Button AriaLabel="上一季">
+                <Icon Type="caret-left" Theme="IconThemeType.Outline" />
+            </Button>
+            <SimpleSelect DefaultValue="@("2025S1")" Style="width: auto;">
+                <SelectOptions>
+                    <SimpleSelectOption Value="2025S1" Label="2025年春季番"></SimpleSelectOption>
+                    <SimpleSelectOption Value="2025S2" Label="2025年夏季番"></SimpleSelectOption>
+                    <SimpleSelectOption Value="2025S3" Label="2025年秋季番"></SimpleSelectOption>
+                    <SimpleSelectOption Value="2025S4" Label="2025年冬季番"></SimpleSelectOption>
+                </SelectOptions>
+            </SimpleSelect>
+            <Button AriaLabel="下一季">
+                <Icon Type="caret-right" Theme="IconThemeType.Outline" />
+            </Button>
+        </InputGroup>
+    </TabBarExtraContent>
+</Tabs>
+
+@code {
+    string activeKey { get; set; } = "1";
+
+    void OnTabChange(string key)
+    {
+        Console.WriteLine($"tab change:{key}");
+    }
+}
+

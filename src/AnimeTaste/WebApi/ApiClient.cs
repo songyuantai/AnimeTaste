@@ -22,14 +22,24 @@ namespace AnimeTaste.WebApi
         /// <summary>
         /// 尝试添加jwt
         /// </summary>
-        private async Task TryAddToken()
+        private async Task HandleToken(bool anymous)
         {
-
-            var token = await js.InvokeAsync<string>("localStorage.getItem", AUTH_KEY);
-            if (!string.IsNullOrEmpty(token))
+            if (anymous)
             {
-                Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                if (Client.DefaultRequestHeaders.Contains(AUTH_KEY))
+                {
+                    Client.DefaultRequestHeaders.Remove(AUTH_KEY);
+                }
             }
+            else
+            {
+                var token = await js.InvokeAsync<string>("localStorage.getItem", AUTH_KEY);
+                if (!string.IsNullOrEmpty(token))
+                {
+                    Client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+                }
+            }
+
         }
 
         /// <summary>
@@ -48,10 +58,7 @@ namespace AnimeTaste.WebApi
         {
             try
             {
-                if (anymous)
-                {
-                    await TryAddToken();
-                }
+                await HandleToken(anymous);
 
                 var response = await Client.GetAsync(action);
 
@@ -81,10 +88,7 @@ namespace AnimeTaste.WebApi
         {
             try
             {
-                if (anymous)
-                {
-                    await TryAddToken();
-                }
+                await HandleToken(anymous);
 
                 var response = await Client.PostAsJsonAsync(Client.BaseAddress + action, data);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)

@@ -1,4 +1,5 @@
 using AnimeTaste.Auth;
+using AnimeTaste.Client;
 using AnimeTaste.Core;
 using AnimeTaste.Core.Const;
 using AnimeTaste.Service;
@@ -32,12 +33,14 @@ namespace AnimeTaste
             {
                 Policy.GetPolicyList().ForEach(policy => op.AddPolicy(policy, m => m.RequireClaim(policy, "true")));
             });
+            services.AddScoped<JsService>();
             services.TryAddScoped<AuthenticationStateProvider, ExternalAuthStateProvider>();
             services.AddCascadingAuthenticationState();
             services.AddSugarSql("server=localhost;userid=root;password=root;database=anime;AllowLoadLocalInfile=true");
             services.AddSysServices();
             services.AddCoreServices();
             services.AddScoped<ApiClient>();
+
 
             mainBlazorWebView.Services = services.BuildServiceProvider();
             Core.App.SetProvider(mainBlazorWebView.Services);
