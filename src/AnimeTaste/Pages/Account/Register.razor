@@ -1,6 +1,88 @@
 ﻿@page "/accout/register"
-<h3>Register</h3>
+@using AnimeTaste.ViewModel;
+@using AnimeTaste.WebApi;
+@inject ApiClient api;
+@inject IMessageService message;
+@inject NavigationManager navigationManager;
+<div>
+    <GridRow>
+        <GridCol Span="12" Offset="6" Style="padding-top: 20vh;">
+            <Form Model="@model"
+            OnFinish="OnFinish"
+            OnFinishFailed="OnFinishFailed"
+            LabelColSpan="8"
+            WrapperColSpan="16">
+                <FormItem Label="用户名">
+                    <Input @bind-Value="@context.UserNo" />
+                </FormItem>
+                <FormItem Label="姓名">
+                    <Input @bind-Value="@context.UserName" />
+                </FormItem>
+                <FormItem Label="密码">
+                    <InputPassword @bind-Value="@context.Password" />
+                </FormItem>
+                <FormItem Label="重复密码">
+                    <InputPassword @bind-Value="@context.PasswordRepeat" />
+                </FormItem>
+                <FormItem Label="邮箱">
+                    <Input @bind-Value="@context.Email" />
+                </FormItem>
+                <FormItem Label="用户组">
+                    <Select @bind-Value="@context.SystemRoleId"
+                        DataSource="@roles"
+                        TItemValue="int?"
+                        TItem="AnimeTaste.ViewModel.Ui.SelectOption"></Select>
+                </FormItem>
+                <FormItem WrapperColOffset="8" WrapperColSpan="16">
+                    <Button Type="@ButtonType.Primary" HtmlType="submit">
+                        注册
+                    </Button>
+                </FormItem>
+            </Form>
+        </GridCol>
+    </GridRow>
+</div>
 
 @code {
+    private UserRegisterVm model = new();
 
+    private List<AnimeTaste.ViewModel.Ui.SelectOption> roles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = await api.GetSystemRoleOptions();
+
+        if(null != options && null != options.Data)
+        {
+            options.Data.ForEach(m => roles.Add(m));
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnFinish(EditContext editContext)
+    {
+        var result = await api.RegisterAsync(model);
+        if(null != result){
+            if (result.IsSuccess)
+            {
+                await message.Success(result.Message);
+                navigationManager.NavigateTo("/account/login");
+            }
+            else
+            {
+                await message.Error(result.Message);
+            }
+        }
+        else
+        {
+            await message.Error("网络或系统内部错误，请检查！");
+        }
+
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        
+    }
 }

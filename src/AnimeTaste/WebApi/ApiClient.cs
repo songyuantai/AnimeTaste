@@ -1,4 +1,6 @@
 ﻿using AnimeTaste.Core.Model;
+using AnimeTaste.ViewModel;
+using AnimeTaste.ViewModel.Ui;
 using Microsoft.JSInterop;
 using System.Diagnostics;
 using System.Net.Http.Json;
@@ -52,6 +54,25 @@ namespace AnimeTaste.WebApi
         {
             var data = new { userNo, password };
             return await PostAsync<dynamic, Result<LoginInOut>>("/account/login", data, true);
+        }
+
+        /// <summary>
+        /// 注册
+        /// </summary>
+        /// <param name="registerVm"></param>
+        /// <returns></returns>
+        public async Task<Result<bool>?> RegisterAsync(UserRegisterVm registerVm)
+        {
+            return await PostAsync<UserRegisterVm, Result<bool>>("/account/register", registerVm, true);
+        }
+
+        /// <summary>
+        /// 获取系统角色列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result<List<SelectOption>>?> GetSystemRoleOptions()
+        {
+            return await GetAsync<Result<List<SelectOption>>>("/common/SystemRoleOptions", true);
         }
 
         private async Task<T?> GetAsync<T>(string action, bool anymous = false)

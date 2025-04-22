@@ -1,6 +1,7 @@
 ﻿using AnimeTaste.Core;
 using AnimeTaste.Core.Model;
 using AnimeTaste.Service;
+using AnimeTaste.ViewModel;
 using AnimeTaste.WebApi.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,11 @@ namespace AnimeTaste.WebApi.Controllers
     [ApiController]
     public class AccountController(UserService service) : ControllerBase
     {
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <param name="loginIn"></param>
+        /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
@@ -34,6 +40,19 @@ namespace AnimeTaste.WebApi.Controllers
             };
             return result!.Ok("登录成功！", data);
 
+        }
+
+        /// <summary>
+        /// 注册
+        /// </summary>
+        /// <param name="registerVm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("register")]
+        public async Task<Result<bool>> Register(UserRegisterVm registerVm)
+        {
+            return await service.RegisterAsync(registerVm);
         }
 
     }

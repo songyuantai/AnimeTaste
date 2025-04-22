@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AnimeTaste.Core\AnimeTaste.Core.csproj" />
     <ProjectReference Include="..\AnimeTaste.Service\AnimeTaste.Service.csproj" />
+    <ProjectReference Include="..\AnimeTaste.ViewModel\AnimeTaste.ViewModel.csproj" />
   </ItemGroup>
 
 </Project>
