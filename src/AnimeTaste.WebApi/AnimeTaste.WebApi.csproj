@@ -7,8 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JikanDotNet" Version="2.9.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
+    <PackageReference Include="OpenAI" Version="2.1.0" />
     <PackageReference Include="SqlSugarCore" Version="5.1.4.185" />
   </ItemGroup>
 

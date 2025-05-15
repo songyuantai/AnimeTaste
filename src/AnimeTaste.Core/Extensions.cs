@@ -1,4 +1,5 @@
 ﻿using AnimeTaste.Core.Model;
+using AnimeTaste.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AnimeTaste.Core
@@ -24,6 +25,7 @@ namespace AnimeTaste.Core
         public static void AddCoreServices(this IServiceCollection services)
         {
             services.AddTransient(typeof(Result<>));
+            services.AddSingleton(typeof(Ai));
         }
 
     }
