@@ -16,7 +16,7 @@ namespace AnimeTaste.WebApi
     {
         public HttpClient Client { get; private set; } = new HttpClient()
         {
-            BaseAddress = new Uri("http://localhost:5298/api")
+            BaseAddress = new Uri("http://localhost:9098/api")
         };
 
         public const string AUTH_KEY = "auth";
