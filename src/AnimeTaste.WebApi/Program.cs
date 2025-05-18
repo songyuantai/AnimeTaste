@@ -1,7 +1,6 @@
 using AnimeTaste.Core;
 using AnimeTaste.Service;
-using AnimeTaste.WebApi.Auth;
-using AnimeTaste.WebApi.Storage;
+using AnimeTaste.WebApi.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
@@ -17,6 +16,7 @@ namespace AnimeTaste.WebApi
 
             var configuration = builder.Configuration;
 
+            //jwt
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -37,8 +37,10 @@ namespace AnimeTaste.WebApi
                 };
             });
 
+            //sugarsql
             builder.Services.AddSugarSql("server=localhost;userid=root;password=root;database=anime;AllowLoadLocalInfile=true");
 
+            //minio
             builder.Services.AddMinio(minioClient => minioClient
                     .WithEndpoint(configuration["MinioSettings:Endpoint"])
                     .WithCredentials(configuration["MinioSettings:AccessKey"], configuration["MinioSettings:SecretKey"])
@@ -49,9 +51,10 @@ namespace AnimeTaste.WebApi
 
             builder.Services.AddSysServices();
 
-            builder.Services.AddSingleton<JwtHelper>();
+            builder.Services.AddRedisCache(configuration);
 
-            builder.Services.AddTransient<MinioService>();
+            //api自身服务
+            builder.Services.AddApiServices();
 
             builder.Services.AddControllers();
 

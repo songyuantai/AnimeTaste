@@ -50,13 +50,13 @@
     {
         if (string.IsNullOrEmpty(model.UserNo))
         {
-            await message.Error("请输入用户名！");
+            message.Error("请输入用户名！");
             return;
         }
 
         if (string.IsNullOrEmpty(model.Password))
         {
-            await message.Error("请输入密码！");
+            message.Error("请输入密码！");
             return;
         }
 
@@ -70,7 +70,7 @@
         }
         else
         {
-            await message.Error(result!.Message);
+            message.Error(result!.Message);
         }
     }
 

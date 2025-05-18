@@ -62,9 +62,9 @@ namespace AnimeTaste
         {
             BeginInvoke(() =>
             {
-                //var maintain = mainBlazorWebView.Services.GetService<DbMaintainService>();
+                var maintain = mainBlazorWebView.Services.GetService<Service.DbMaintain.DbMaintainService>();
                 // maintain?.DropTables();
-                //maintain?.InitTables();
+                maintain?.InitTables();
                 //maintain?.SeedData();
             });
 

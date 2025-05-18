@@ -75,6 +75,16 @@ namespace AnimeTaste.WebApi
             return await GetAsync<Result<List<SelectOption>>>("/common/SystemRoleOptions", true);
         }
 
+        /// <summary>
+        /// 获取季度选项
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<LabeledValue>> GetSeasonOptionsAsync()
+        {
+            // why api?
+            return await GetAsync<List<LabeledValue>>("/api/season/season_list_option", true) ?? [];
+        }
+
         private async Task<T?> GetAsync<T>(string action, bool anymous = false)
         {
             try
@@ -86,7 +96,11 @@ namespace AnimeTaste.WebApi
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<T>(json);
+                    var option = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    };
+                    return JsonSerializer.Deserialize<T>(json, option);
                 }
             }
             catch (OperationCanceledException ex)

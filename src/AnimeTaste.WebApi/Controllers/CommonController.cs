@@ -10,7 +10,7 @@ namespace AnimeTaste.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CommonController(ISqlSugarClient db) : Controller
+    public class CommonController(ISqlSugarClient db) : ControllerBase
     {
         [HttpGet]
         [AllowAnonymous]

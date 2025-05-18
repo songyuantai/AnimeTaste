@@ -66,17 +66,17 @@
         if(null != result){
             if (result.IsSuccess)
             {
-                await message.Success(result.Message);
+                message.Success(result.Message);
                 navigationManager.NavigateTo("/account/login");
             }
             else
             {
-                await message.Error(result.Message);
+                message.Error(result.Message);
             }
         }
         else
         {
-            await message.Error("网络或系统内部错误，请检查！");
+            message.Error("网络或系统内部错误，请检查！");
         }
 
     }

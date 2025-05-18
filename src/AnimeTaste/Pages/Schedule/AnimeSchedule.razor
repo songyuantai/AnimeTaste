@@ -1,4 +1,8 @@
-﻿@page "/anime_schedule"
+﻿@using AnimeTaste.ViewModel.Ui
+@using AnimeTaste.WebApi
+@page "/anime_schedule"
+@inject ApiClient api;
+
 <Tabs @bind-ActiveKey="@activeKey" OnChange="OnTabChange" Animated>
 
     <ChildContent>
@@ -29,14 +33,26 @@
             <Button AriaLabel="上一季">
                 <Icon Type="caret-left" Theme="IconThemeType.Outline" />
             </Button>
-            <SimpleSelect DefaultValue="@("2025S1")" Style="width: auto;">
+            @*             <SimpleSelect DefaultValue="@("2025S1")" Style="width: auto;">
                 <SelectOptions>
                     <SimpleSelectOption Value="2025S1" Label="2025年春季番"></SimpleSelectOption>
                     <SimpleSelectOption Value="2025S2" Label="2025年夏季番"></SimpleSelectOption>
                     <SimpleSelectOption Value="2025S3" Label="2025年秋季番"></SimpleSelectOption>
                     <SimpleSelectOption Value="2025S4" Label="2025年冬季番"></SimpleSelectOption>
                 </SelectOptions>
-            </SimpleSelect>
+            </SimpleSelect> *@
+            <Select Mode="default" Style="width: auto;"
+            Placeholder="Please select"
+            DataSource="@_options"
+            @bind-Value="@_selectedValue"
+            LabelName="@nameof(LabeledValue.Label)"
+            ValueName="@nameof(LabeledValue.Value)"
+            DisabledName="@nameof(LabeledValue.Disabled)"
+            TItemValue="string"
+            TItem="LabeledValue"
+            OnSelectedItemChanged="OnSelectedItemChangedHandler"
+            EnableSearch
+            EnableVirtualization />
             <Button AriaLabel="下一季">
                 <Icon Type="caret-right" Theme="IconThemeType.Outline" />
             </Button>
@@ -47,9 +63,29 @@
 @code {
     string activeKey { get; set; } = "1";
 
+    List<LabeledValue> _options = [];
+
+    string _selectedValue = "";
+
     void OnTabChange(string key)
     {
         Console.WriteLine($"tab change:{key}");
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var list = await api.GetSeasonOptionsAsync();
+        list.Reverse();
+        _options.AddRange(list);
+
+        _selectedValue = _options.FirstOrDefault()?.Value ?? "";
+
+        await base.OnInitializedAsync();
+    }
+
+    private void OnSelectedItemChangedHandler(LabeledValue value)
+    {
+        Console.WriteLine($"selected: ${value.Label}");
     }
 }
 

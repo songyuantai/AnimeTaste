@@ -22,6 +22,53 @@ namespace AnimeTaste.Core
             return result;
         }
 
+        /// <summary>
+        /// 异步循环（无序）
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static Task LoopAsync<T>(this IEnumerable<T> list, Func<T, Task> function)
+        {
+            return Task.WhenAll(list.Select(function));
+        }
+
+        /// <summary>
+        /// 异步循环并返回结果（无序）
+        /// </summary>
+        /// <typeparam name="TIn"></typeparam>
+        /// <typeparam name="TOut"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public async static Task<IEnumerable<TOut>> LoopAsyncResult<TIn, TOut>(this IEnumerable<TIn> list, Func<TIn, Task<TOut>> function)
+        {
+            var loopResult = await Task.WhenAll(list.Select(function));
+
+            return loopResult.ToList().AsEnumerable();
+        }
+
+        /// <summary>
+        /// 选择非空的结果为子列表
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="V"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static IEnumerable<V> PickNotNull<T, V>(this IEnumerable<T> source, Func<T, V?> selector)
+        {
+            foreach (var item in source)
+            {
+                var v = selector(item);
+                if (v is not null)
+                {
+                    yield return v; // 编译器自动推断v为非空
+                }
+            }
+        }
+
         public static void AddCoreServices(this IServiceCollection services)
         {
             services.AddTransient(typeof(Result<>));

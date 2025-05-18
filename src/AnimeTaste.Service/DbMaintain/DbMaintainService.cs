@@ -13,9 +13,11 @@ namespace AnimeTaste.Service.DbMaintain
         {
             //db.DbMaintenance.CreateDatabase("anime");
 
-            Type[] types = Assembly
+            var types = Assembly
                 .LoadFrom(DLL)
-                .GetTypes();
+                .GetTypes()
+                .Where(t => !t.IsValueType || (t.IsValueType && !t.IsEnum))
+                .ToArray();
             //.Where(it => it.FullName.Contains("OrmTest."))
             //.ToArray();
 
