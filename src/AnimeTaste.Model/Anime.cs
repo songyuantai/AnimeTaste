@@ -24,7 +24,7 @@ namespace AnimeTaste.Model
         /// <summary>
         /// 番剧别名
         /// </summary>
-        [SugarColumn(ColumnDescription = "季度名称")]
+        [SugarColumn(ColumnDescription = "番剧别名")]
         public string? Alias { get; set; }
 
         /// <summary>
@@ -44,6 +44,54 @@ namespace AnimeTaste.Model
         /// </summary>
         [SugarColumn(ColumnDescription = "番剧状态")]
         public AnimeStatus Status { get; set; }
+
+        /// <summary>
+        /// 播出日期
+        /// </summary>
+        [SugarColumn(ColumnDescription = "播出日期")]
+        public DateTime? AiringDate { get; set; }
+
+        /// <summary>
+        /// 播出结束时间
+        /// </summary>
+        [SugarColumn(ColumnDescription = "结束时间")]
+        public DateTime? AiriedDate { get; set; }
+
+        /// <summary>
+        /// 每周播出日期
+        /// </summary>
+        [SugarColumn(ColumnDescription = "每周播出日期")]
+        public int? BroadcastDay { get; set; }
+
+        /// <summary>
+        /// 每周播出时间
+        /// </summary>
+        [SugarColumn(ColumnDescription = "每周播出时间")]
+        public string? BroadcastTime { get; set; }
+
+        /// <summary>
+        /// 集数
+        /// </summary>
+        [SugarColumn(ColumnDescription = "集数")]
+        public int? EpisodeCount { get; set; }
+
+        /// <summary>
+        /// 评分
+        /// </summary>
+        [SugarColumn(ColumnDescription = "评分")]
+        public double? Scroe { get; set; }
+
+        /// <summary>
+        /// 排名
+        /// </summary>
+        [SugarColumn(ColumnDescription = "排名")]
+        public int? Rank { get; set; }
+
+        /// <summary>
+        /// 评级
+        /// </summary>
+        [SugarColumn(ColumnDescription = "评级")]
+        public string? Rating { get; set; }
 
         /// <summary>
         /// 创建时间

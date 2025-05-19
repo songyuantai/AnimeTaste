@@ -57,7 +57,7 @@ namespace AnimeTaste.Core
         /// <param name="source"></param>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static IEnumerable<V> PickNotNull<T, V>(this IEnumerable<T> source, Func<T, V?> selector)
+        public static IEnumerable<V> AsNotNull<T, V>(this IEnumerable<T> source, Func<T, V?> selector)
         {
             foreach (var item in source)
             {
@@ -67,6 +67,21 @@ namespace AnimeTaste.Core
                     yield return v; // 编译器自动推断v为非空
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取指定步长的嵌套list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public static IEnumerable<IEnumerable<T>> GetNestList<T>(this IEnumerable<T> source, int step)
+        {
+            return source.Select((x, i) => new { Index = i, Value = x })
+                            .GroupBy(x => x.Index / step)
+                            .Select(g => g.Select(x => x.Value).ToList())
+                            .ToList();
         }
 
         public static void AddCoreServices(this IServiceCollection services)

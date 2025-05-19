@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AntDesign" Version="1.4.0" />
-    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="9.0.70" />
-    <PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AntDesign" Version="1.4.0" />
+		<PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="9.0.70" />
+		<PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AnimeTaste.Service\AnimeTaste.Service.csproj" />
-    <ProjectReference Include="..\AnimeTaste.ViewModel\AnimeTaste.ViewModel.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AnimeTaste.Service\AnimeTaste.Service.csproj" />
+		<ProjectReference Include="..\AnimeTaste.ViewModel\AnimeTaste.ViewModel.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Update="wwwroot\imgs\brand_64x64.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Update="wwwroot\imgs\brand_64x64.ico">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

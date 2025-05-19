@@ -19,5 +19,10 @@
         /// 即将到来
         /// </summary>
         Upcoming,
+
+        /// <summary>
+        /// 未知
+        /// </summary>
+        Unknown,
     }
 }

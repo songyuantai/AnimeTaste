@@ -1,10 +1,13 @@
 ﻿using AnimeTaste.Core;
+using Dm.util;
 using StackExchange.Redis;
 
 namespace AnimeTaste.Service.Cache
 {
     public class RedisService(ConnectionMultiplexer conn)
     {
+        private IDatabase db = conn.GetDatabase();
+
         /// <summary>
         /// 列表插入
         /// </summary>
@@ -14,7 +17,6 @@ namespace AnimeTaste.Service.Cache
         /// <returns></returns>
         public async Task<bool> ListAdd<T>(string key, params List<T> list) where T : class
         {
-            var db = conn.GetDatabase();
             foreach (var item in list)
             {
                 var value = item.ToJson();
@@ -32,11 +34,34 @@ namespace AnimeTaste.Service.Cache
         /// <returns></returns>
         public async Task<List<T>> ListGet<T>(string key, int start = 0, int end = -1) where T : class
         {
-            var db = conn.GetDatabase();
             var list = await db.ListRangeAsync(key, start, end);
-            return [.. list.PickNotNull(x => x.ToString().ToObject<T>())];
+            return [.. list.AsNotNull(x => x.ToString().ToObject<T>())];
         }
 
+        /// <summary>
+        /// 列表替换（先删除）
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public async Task<bool> ListReplace<T>(string key, List<T> list) where T : class
+        {
+            if (await db.KeyExistsAsync(key))
+            {
+                if (!await db.KeyDeleteAsync(key))
+                {
+                    return false;
+                }
+            }
+            return await ListAdd(key, list);
+        }
+
+        /// <summary>
+        /// key删除
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public async Task<bool> KeyDeleteAsync(string key)
         {
             var db = conn.GetDatabase();
@@ -44,15 +69,34 @@ namespace AnimeTaste.Service.Cache
         }
 
         /// <summary>
-        /// 
+        /// 实体搜索
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="match"></param>
+        /// <param name="rangeCount"></param>
+        /// <returns></returns>
+        public async Task<List<T>> ScanEntityList<T>(string match, int rangeCount = 10) where T : class
+        {
+            //var keys = await ScanKeys(match, rangeCount);
+            //var data = await keys.GetNestList(rangeCount).LoopAsyncResult((t) => db.StringGetAsync([.. t]));
+            //return [.. data.SelectMany(x => x).Select(m => m.ToString().ToObject<T>()).PickNotNull(m => m)];
+            List<T> list = [];
+            await foreach (var keys in ScanKeysAsyncEnumerable(match, rangeCount))
+            {
+                var result = await db.StringGetAsync(keys);
+                list.AddRange(result.Select(m => m.toString().ToObject<T>()).AsNotNull(m => m));
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// key扫描
         /// </summary>
         /// <param name="match"></param>
         /// <param name="count"></param>
         /// <returns></returns>
         public async Task<List<RedisKey>> ScanKeys(string match, int count)
         {
-            var db = conn.GetDatabase();
-
             List<RedisKey> keys = [];
 
             long cursor = 0;
@@ -72,8 +116,24 @@ namespace AnimeTaste.Service.Cache
             return keys;
         }
 
+        public async IAsyncEnumerable<RedisKey[]> ScanKeysAsyncEnumerable(string match, int count)
+        {
+            List<RedisKey> keys = [];
+
+            long cursor = 0;
+            do
+            {
+                var scanResult = await db.ExecuteAsync("SCAN", cursor, "COUNT", count, "MATCH", match);
+                cursor = (long)scanResult[0];
+#nullable disable
+                yield return ((RedisResult[])scanResult[1]).Select(m => (RedisKey)(string)m).ToArray();
+#nullable restore
+            } while (cursor != 0);
+
+        }
+
         /// <summary>
-        /// 
+        /// key扫描
         /// </summary>
         /// <param name="server"></param>
         /// <param name="match"></param>
@@ -100,6 +160,13 @@ namespace AnimeTaste.Service.Cache
             return keys;
         }
 
+        /// <summary>
+        /// key扫描（包含所有server）
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <param name="match"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public async Task<List<RedisKey>> ScanKeys(ConnectionMultiplexer conn, string match, int count)
         {
             var ipList = conn.GetEndPoints().Select(m => m.ToString()).ToList();

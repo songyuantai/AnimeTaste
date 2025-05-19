@@ -33,26 +33,18 @@
             <Button AriaLabel="上一季">
                 <Icon Type="caret-left" Theme="IconThemeType.Outline" />
             </Button>
-            @*             <SimpleSelect DefaultValue="@("2025S1")" Style="width: auto;">
-                <SelectOptions>
-                    <SimpleSelectOption Value="2025S1" Label="2025年春季番"></SimpleSelectOption>
-                    <SimpleSelectOption Value="2025S2" Label="2025年夏季番"></SimpleSelectOption>
-                    <SimpleSelectOption Value="2025S3" Label="2025年秋季番"></SimpleSelectOption>
-                    <SimpleSelectOption Value="2025S4" Label="2025年冬季番"></SimpleSelectOption>
-                </SelectOptions>
-            </SimpleSelect> *@
-            <Select Mode="default" Style="width: auto;"
-            Placeholder="Please select"
-            DataSource="@_options"
-            @bind-Value="@_selectedValue"
-            LabelName="@nameof(LabeledValue.Label)"
-            ValueName="@nameof(LabeledValue.Value)"
-            DisabledName="@nameof(LabeledValue.Disabled)"
-            TItemValue="string"
-            TItem="LabeledValue"
-            OnSelectedItemChanged="OnSelectedItemChangedHandler"
-            EnableSearch
-            EnableVirtualization />
+            <Select Mode="default" Style="width: auto; min-width: 180px;"
+                Placeholder="Please select"
+                DataSource="@_options"
+                @bind-Value="@_selectedValue"
+                LabelName="@nameof(LabeledValue.Label)"
+                ValueName="@nameof(LabeledValue.Value)"
+                DisabledName="@nameof(LabeledValue.Disabled)"
+                TItemValue="string"
+                TItem="LabeledValue"
+                OnSelectedItemChanged="OnSelectedItemChangedHandler"
+                EnableSearch
+                EnableVirtualization />
             <Button AriaLabel="下一季">
                 <Icon Type="caret-right" Theme="IconThemeType.Outline" />
             </Button>
