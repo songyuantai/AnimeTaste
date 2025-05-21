@@ -1,5 +1,6 @@
-﻿using AnimeTaste.Core.Utils;
-using AnimeTaste.Model.Const;
+﻿using AnimeTaste.Core.Const;
+using AnimeTaste.Core.Utils;
+using AnimeTaste.Model;
 using AnimeTaste.Service.Cache;
 using JikanDotNet;
 using SqlSugar;
@@ -8,7 +9,7 @@ using Season = AnimeTaste.Model.Season;
 
 namespace AnimeTaste.Service
 {
-    public class SeasonService(ISqlSugarClient db, RedisService redis, IJikan jikan)
+    public class SeasonService(ISqlSugarClient db, RedisService redis, IJikan jikan, AnimeService animeService)
     {
         public async Task<List<Season>> GetOrAddSeasonList()
         {
@@ -60,7 +61,7 @@ namespace AnimeTaste.Service
 
                 if (list.Count == 0)
                 {
-                    var animes = await AddOrUpdateSeasonAnimes(seasonId, dayOfWeek);
+                    var animes = await AddOrUpdateSeasonAnimes(seasonId);
                     foreach (var g in animes.GroupBy(m => m.BroadcastDay))
                     {
                         var groupKey = $"{DayAnimeList}:{seasonId}:{g.Key}";
@@ -71,7 +72,8 @@ namespace AnimeTaste.Service
                         }
                     }
                 }
-                else
+
+                if (list.Count > 0)
                 {
                     await redis.ListAdd(key, list);
                 }
@@ -80,7 +82,7 @@ namespace AnimeTaste.Service
             return list;
         }
 
-        private async Task<List<Anime>> AddOrUpdateSeasonAnimes(int seasonId, int dayOfWeek)
+        private async Task<List<Anime>> AddOrUpdateSeasonAnimes(int seasonId)
         {
             List<Anime> list = [];
             var season = await db.Queryable<Season>().Where(m => m.Id == seasonId).FirstAsync();
@@ -94,13 +96,28 @@ namespace AnimeTaste.Service
                 var data = await jikan.GetSeasonAsync(year, seasonOfYear, page);
                 if (data.Data.Count == 0 || !data.Pagination.HasNextPage) break;
 
-                var animes = data.Data.Select(m => ToSysAnime(m, seasonId)).ToList();
+                await db.Ado.BeginTranAsync();
+                try
+                {
+                    foreach (var source in data.Data)
+                    {
+                        (var anime, var images) = ToSysAnime(source, seasonId);
 
-                await StorageAnimeToDb(animes);
+                        await animeService.AddOrUpdateAnime(anime);
+                        await animeService.AddOrUpdateAnimeImages(anime, images);
+                        await animeService.AddOrUpdateAnimeGenres(anime, source.Genres);
+                        list.Add(anime);
 
-                list.AddRange(animes);
+                    }
+                    await db.Ado.CommitTranAsync();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Exception(ex);
+                    await db.Ado.RollbackTranAsync();
+                }
 
-                await Task.Delay(500);
+                await Task.Delay(200);
 
                 page++;
             }
@@ -108,39 +125,10 @@ namespace AnimeTaste.Service
             return list;
         }
 
-        private async Task StorageAnimeToDb(params List<Anime> animes)
-        {
-
-            try
-            {
-                db.Ado.BeginTran();
-                foreach (var anime in animes)
-                {
-                    if (!await db.Queryable<Anime>().Where(m => m.Name == anime.Name).AnyAsync())
-                    {
-                        await db.Insertable(anime).ExecuteCommandIdentityIntoEntityAsync();
-                    }
-                    else
-                    {
-                        await db.Updateable(anime)
-                            .IgnoreColumns(nameof(Anime.Id))
-                            .WhereColumns(nameof(Anime.Name))
-                            .ExecuteCommandAsync();
-                    }
-                }
-                await db.Ado.CommitTranAsync();
-            }
-            catch (Exception ex)
-            {
-                await db.Ado.RollbackTranAsync();
-                Logger.Exception(ex);
-            }
-        }
-
-        private static Anime ToSysAnime(JikanDotNet.Anime source, int seasonId)
+        private static (Anime, List<AnimeImage>) ToSysAnime(JikanDotNet.Anime source, int seasonId)
         {
             //images  genres
-            return new()
+            Anime anime = new()
             {
                 Name = source.Titles.FirstOrDefault()?.Title ?? string.Empty,
                 Alias = string.Empty,
@@ -156,6 +144,30 @@ namespace AnimeTaste.Service
                 Rank = source.Rank,
                 CreateTime = DateTime.Now,
             };
+
+            List<AnimeImage> images = [];
+            const string JPG = "jpg";
+
+            TryAddImage(images, source.Images.JPG.ImageUrl, AnimeImageType.DEFAULT, JPG);
+            TryAddImage(images, source.Images.JPG.SmallImageUrl, AnimeImageType.SMALL, JPG);
+            TryAddImage(images, source.Images.JPG.MediumImageUrl, AnimeImageType.MEDUIM, JPG);
+            TryAddImage(images, source.Images.JPG.LargeImageUrl, AnimeImageType.LARGE, JPG);
+
+            return (anime, images);
+        }
+
+        private static void TryAddImage(List<AnimeImage> list, string url, string imageType, string suffix)
+        {
+            if (!string.IsNullOrEmpty(url))
+            {
+                var image = new AnimeImage()
+                {
+                    ImageType = imageType,
+                    Suffix = suffix,
+                    RemoteUrl = url,
+                };
+                list.Add(image);
+            }
         }
 
         private static AnimeStatus GetAnimeStatus(string status)

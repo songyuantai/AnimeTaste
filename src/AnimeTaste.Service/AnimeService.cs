@@ -1,0 +1,104 @@
+﻿using AnimeTaste.Model;
+using SqlSugar;
+
+namespace AnimeTaste.Service
+{
+    /// <summary>
+    /// 番剧服务
+    /// </summary>
+    /// <param name="db"></param>
+    public class AnimeService(ISqlSugarClient db)
+    {
+        /// <summary>
+        /// 添加或者更新番剧信息
+        /// </summary>
+        /// <param name="animes"></param>
+        /// <returns></returns>
+        public async Task AddOrUpdateAnime(params List<Anime> animes)
+        {
+            foreach (var anime in animes)
+            {
+                if (!await db.Queryable<Anime>().Where(m => m.Name == anime.Name).AnyAsync())
+                {
+                    await db.Insertable(anime).ExecuteCommandIdentityIntoEntityAsync();
+                }
+                else
+                {
+                    await db.Updateable(anime)
+                        .IgnoreColumns(nameof(Anime.Id))
+                        .WhereColumns(nameof(Anime.Name))
+                        .ExecuteCommandAsync();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 添加或者更新番剧图片
+        /// </summary>
+        /// <param name="anime"></param>
+        /// <param name="images"></param>
+        /// <returns></returns>
+        public async Task AddOrUpdateAnimeImages(Anime anime, params List<AnimeImage> images)
+        {
+            foreach (var image in images)
+            {
+                var entity = await db.Queryable<AnimeImage>().Where(m => m.AnimeId == anime.Id && m.ImageType == image.ImageType).FirstAsync();
+                if (null == entity)
+                {
+                    await db.Insertable(image).ExecuteCommandIdentityIntoEntityAsync();
+                }
+                else
+                {
+                    entity.RemoteUrl = image.RemoteUrl;
+                    entity.StorageUrl = image.StorageUrl;
+                    entity.StorageType = image.StorageType;
+
+                    await db.Updateable(entity)
+                        .ExecuteCommandAsync();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 添加或者更新番剧类别
+        /// </summary>
+        /// <param name="anime"></param>
+        /// <param name="genres"></param>
+        /// <returns></returns>
+        public async Task AddOrUpdateAnimeGenres(Anime anime, params ICollection<JikanDotNet.MalUrl> genres)
+        {
+            foreach (var genre in genres)
+            {
+                var entity = await db.Queryable<Genre>()
+                    .Where(m => m.Name == genre.Name && m.Type == genre.Type)
+                    .FirstAsync();
+
+                if (null == entity)
+                {
+                    entity = new()
+                    {
+                        Name = genre.Name,
+                        Alias = string.Empty,
+                        Url = genre.Url,
+                        CreateDate = DateTime.Now,
+                    };
+
+                    await db.Insertable(entity).ExecuteCommandIdentityIntoEntityAsync();
+
+                    await db.Insertable(new AnimeGenre { AnimeId = anime.Id, GenresId = entity.Id })
+                        .ExecuteCommandAsync();
+                }
+                else
+                {
+                    if (!await db.Queryable<AnimeGenre>()
+                        .Where(m => m.AnimeId == anime.Id && m.GenresId == entity.Id)
+                        .AnyAsync())
+                    {
+                        await db.Insertable(new AnimeGenre { AnimeId = anime.Id, GenresId = entity.Id })
+                        .ExecuteCommandAsync();
+                    }
+                }
+            }
+        }
+    }
+}

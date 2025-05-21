@@ -1,5 +1,4 @@
-﻿using AnimeTaste.Core;
-using Dm.util;
+﻿using Dm.util;
 using StackExchange.Redis;
 
 namespace AnimeTaste.Service.Cache
@@ -35,7 +34,7 @@ namespace AnimeTaste.Service.Cache
         public async Task<List<T>> ListGet<T>(string key, int start = 0, int end = -1) where T : class
         {
             var list = await db.ListRangeAsync(key, start, end);
-            return [.. list.AsNotNull(x => x.ToString().ToObject<T>())];
+            return [.. list.SelectNotNull(x => x.ToString().ToObject<T>())];
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace AnimeTaste.Service.Cache
             await foreach (var keys in ScanKeysAsyncEnumerable(match, rangeCount))
             {
                 var result = await db.StringGetAsync(keys);
-                list.AddRange(result.Select(m => m.toString().ToObject<T>()).AsNotNull(m => m));
+                list.AddRange(result.Select(m => m.toString().ToObject<T>()).SelectNotNull(m => m));
             }
             return list;
         }

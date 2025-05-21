@@ -14,9 +14,9 @@ namespace AnimeTaste.WebApi
     /// <param name="localStorage"></param>
     public class ApiClient(IJSRuntime js)
     {
-        public HttpClient Client { get; private set; } = new HttpClient()
+        public HttpClient Client { get; private set; } = new()
         {
-            BaseAddress = new Uri("http://localhost:9098/api")
+            BaseAddress = new Uri("http://localhost:9098/api/")
         };
 
         public const string AUTH_KEY = "auth";
@@ -53,7 +53,7 @@ namespace AnimeTaste.WebApi
         public async Task<Result<LoginInOut>?> LoginAsync(string userNo, string password)
         {
             var data = new { userNo, password };
-            return await PostAsync<dynamic, Result<LoginInOut>>("/account/login", data, true);
+            return await PostAsync<dynamic, Result<LoginInOut>>("account/login", data, true);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace AnimeTaste.WebApi
         /// <returns></returns>
         public async Task<Result<bool>?> RegisterAsync(UserRegisterVm registerVm)
         {
-            return await PostAsync<UserRegisterVm, Result<bool>>("/account/register", registerVm, true);
+            return await PostAsync<UserRegisterVm, Result<bool>>("account/register", registerVm, true);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace AnimeTaste.WebApi
         /// <returns></returns>
         public async Task<Result<List<SelectOption>>?> GetSystemRoleOptions()
         {
-            return await GetAsync<Result<List<SelectOption>>>("/common/SystemRoleOptions", true);
+            return await GetAsync<Result<List<SelectOption>>>("common/SystemRoleOptions", true);
         }
 
         /// <summary>
@@ -81,9 +81,13 @@ namespace AnimeTaste.WebApi
         /// <returns></returns>
         public async Task<List<LabeledValue>> GetSeasonOptionsAsync()
         {
-            // why api?
-            return await GetAsync<List<LabeledValue>>("/api/season/season_list_option", true) ?? [];
+            return await GetAsync<List<LabeledValue>>("season/season_list_option", true) ?? [];
         }
+
+        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
 
         private async Task<T?> GetAsync<T>(string action, bool anymous = false)
         {
@@ -96,11 +100,7 @@ namespace AnimeTaste.WebApi
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var option = new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    };
-                    return JsonSerializer.Deserialize<T>(json, option);
+                    return JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
                 }
             }
             catch (OperationCanceledException ex)
@@ -129,11 +129,7 @@ namespace AnimeTaste.WebApi
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var option = new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    };
-                    return JsonSerializer.Deserialize<T>(json, option);
+                    return JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
                 }
             }
             catch (OperationCanceledException ex)

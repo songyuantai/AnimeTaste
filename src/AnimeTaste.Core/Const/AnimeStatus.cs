@@ -1,4 +1,4 @@
-﻿namespace AnimeTaste.Model.Const
+﻿namespace AnimeTaste.Core.Const
 {
     /// <summary>
     /// 番剧状态

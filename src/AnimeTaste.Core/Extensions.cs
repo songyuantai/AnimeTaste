@@ -50,14 +50,14 @@ namespace AnimeTaste.Core
         }
 
         /// <summary>
-        /// 选择非空的结果为子列表
+        /// 选择并筛选非空的结果
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="V"></typeparam>
         /// <param name="source"></param>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static IEnumerable<V> AsNotNull<T, V>(this IEnumerable<T> source, Func<T, V?> selector)
+        public static IEnumerable<V> SelectNotNull<T, V>(this IEnumerable<T> source, Func<T, V?> selector)
         {
             foreach (var item in source)
             {

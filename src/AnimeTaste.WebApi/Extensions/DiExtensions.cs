@@ -1,6 +1,7 @@
 ﻿using AnimeTaste.Service.Cache;
 using AnimeTaste.WebApi.Auth;
 using AnimeTaste.WebApi.Storage;
+using JikanDotNet;
 using StackExchange.Redis;
 
 namespace AnimeTaste.WebApi.Extensions
@@ -12,6 +13,8 @@ namespace AnimeTaste.WebApi.Extensions
             services.AddSingleton<JwtHelper>();
 
             services.AddTransient<MinioService>();
+
+            services.AddSingleton<IJikan, Jikan>();
 
             return services;
         }

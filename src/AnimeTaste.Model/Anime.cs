@@ -1,4 +1,4 @@
-﻿using AnimeTaste.Model.Const;
+﻿using AnimeTaste.Core.Const;
 using SqlSugar;
 
 namespace AnimeTaste.Model

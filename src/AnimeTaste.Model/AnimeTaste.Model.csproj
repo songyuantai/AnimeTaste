@@ -10,4 +10,8 @@
     <PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AnimeTaste.Core\AnimeTaste.Core.csproj" />
+  </ItemGroup>
+
 </Project>
