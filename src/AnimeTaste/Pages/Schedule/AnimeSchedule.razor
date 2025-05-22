@@ -1,31 +1,149 @@
-﻿@using AnimeTaste.ViewModel.Ui
+﻿@using AnimeTaste.ViewModel
+@using AnimeTaste.ViewModel.Ui
 @using AnimeTaste.WebApi
 @page "/anime_schedule"
 @inject ApiClient api;
+@{
+    const int span = 4;
+    const int column = 6;
+}
 
 <Tabs @bind-ActiveKey="@activeKey" OnChange="OnTabChange" Animated>
 
     <ChildContent>
         <TabPane Tab="周一" Key="1">
-            周一
+            <Row Gutter="24">
+                @foreach (var schedule in schedules[1])
+                {
+                    <AntDesign.Col Span="span" Style="margin-top:8px; margin-bottom:8px">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+            </Row>
         </TabPane>
         <TabPane Tab="周二" Key="2">
-            周二
+            <Row Gutter="24">
+                @foreach (var schedule in schedules[2])
+                {
+                    <AntDesign.Col Span="span" Style="margin:8px auto">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+
+            </Row>
         </TabPane>
-        <TabPane Tab="周三 3" Key="3">
-            周三
+        <TabPane Tab="周三" Key="3">
+            <Row Gutter="24">
+                @foreach (var schedule in schedules[3])
+                {
+                    <AntDesign.Col Span="span" Style="margin:8px auto">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+            </Row>
         </TabPane>
-        <TabPane Tab="周四 3" Key="4">
-            周四
+        <TabPane Tab="周四" Key="4">
+            <Row Gutter="16">
+                @foreach (var schedule in schedules[4])
+                {
+                    <AntDesign.Col Span="span" Style="margin:8px auto">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+            </Row>
         </TabPane>
         <TabPane Tab="周五" Key="5">
-            周五
+            <Row Gutter="16">
+                @foreach (var schedule in schedules[5])
+                {
+                    <AntDesign.Col Span="span" Style="margin:8px auto">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+            </Row>
         </TabPane>
         <TabPane Tab="周六" Key="6">
-            周六
+            <Row Gutter="16">
+                @foreach (var schedule in schedules[6])
+                {
+                    <AntDesign.Col Span="span" Style="margin:8px auto">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+            </Row>
         </TabPane>
         <TabPane Tab="周日" Key="0">
-            周日
+            <Row Gutter="16">
+                @foreach (var schedule in schedules[0])
+                {
+                    <AntDesign.Col Span="span" Style="margin:8px auto">
+                        <Card Hoverable Bordered>
+                            <Cover>
+                                <Image Src="@schedule.ImageUrl"></Image>
+                            </Cover>
+                            <Body>
+                                <CardMeta Title="@schedule.Title" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                }
+
+                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+            </Row>
         </TabPane>
     </ChildContent>
     <TabBarExtraContent>
@@ -33,18 +151,18 @@
             <Button AriaLabel="上一季">
                 <Icon Type="caret-left" Theme="IconThemeType.Outline" />
             </Button>
-            <Select Mode="default" Style="width: auto; min-width: 180px;"
-                Placeholder="Please select"
-                DataSource="@_options"
-                @bind-Value="@_selectedValue"
-                LabelName="@nameof(LabeledValue.Label)"
-                ValueName="@nameof(LabeledValue.Value)"
-                DisabledName="@nameof(LabeledValue.Disabled)"
-                TItemValue="string"
-                TItem="LabeledValue"
-                OnSelectedItemChanged="OnSelectedItemChangedHandler"
-                EnableSearch
-                EnableVirtualization />
+            <Select @ref="seasonSelect" Mode="default" Style="width: auto; min-width: 180px;"
+            Placeholder="Please select"
+            DataSource="@_options"
+            @bind-Value="@_selectedValue"
+            LabelName="@nameof(LabeledValue.Label)"
+            ValueName="@nameof(LabeledValue.Value)"
+            DisabledName="@nameof(LabeledValue.Disabled)"
+            TItemValue="string"
+            TItem="LabeledValue"
+            OnSelectedItemChanged="OnSelectedItemChangedHandler"
+            EnableSearch
+            EnableVirtualization />
             <Button AriaLabel="下一季">
                 <Icon Type="caret-right" Theme="IconThemeType.Outline" />
             </Button>
@@ -57,11 +175,20 @@
 
     List<LabeledValue> _options = [];
 
+    List<AnimeScheduleInfo>[] schedules = [[], [], [] ,[], [], [], []];
+
     string _selectedValue = "";
 
-    void OnTabChange(string key)
+
+    Select<string, LabeledValue>? seasonSelect;
+
+    async Task OnTabChange(string key)
     {
-        Console.WriteLine($"tab change:{key}");
+        if (!string.IsNullOrEmpty(_selectedValue))
+        {
+            await LoadScheduleList();
+        }
+        //Console.WriteLine($"tab change:{key}");
     }
 
     protected async override Task OnInitializedAsync()
@@ -72,12 +199,26 @@
 
         _selectedValue = _options.FirstOrDefault()?.Value ?? "";
 
+        await LoadScheduleList();
+
         await base.OnInitializedAsync();
     }
 
-    private void OnSelectedItemChangedHandler(LabeledValue value)
+    private async Task OnSelectedItemChangedHandler(LabeledValue value)
     {
-        Console.WriteLine($"selected: ${value.Label}");
+        await LoadScheduleList();
+    }
+
+    private async Task LoadScheduleList()
+    {
+        if (int.TryParse(activeKey, out int dayOfWeek) && int.TryParse(_selectedValue, out int id))
+        {
+            if(schedules[dayOfWeek].Count == 0)
+            {
+                var data = await api.GetAnimeScheduleList(id, dayOfWeek);
+                schedules[dayOfWeek].AddRange(data);
+            }
+        }
     }
 }
 

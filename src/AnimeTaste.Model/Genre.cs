@@ -23,19 +23,19 @@ namespace AnimeTaste.Model
         /// <summary>
         /// 类型
         /// </summary>
-        [SugarColumn(ColumnDescription = "类型")]
+        [SugarColumn(ColumnDescription = "类型", IsNullable = true)]
         public string? Type { get; set; }
 
         /// <summary>
         /// 类别别名
         /// </summary>
-        [SugarColumn(ColumnDescription = "类别别名")]
+        [SugarColumn(ColumnDescription = "类别别名", IsNullable = true)]
         public string? Alias { get; set; }
 
         /// <summary>
         /// 地址
         /// </summary>
-        [SugarColumn(ColumnDescription = "地址")]
+        [SugarColumn(ColumnDescription = "地址", IsNullable = true)]
         public string? Url { get; set; }
 
         /// <summary>

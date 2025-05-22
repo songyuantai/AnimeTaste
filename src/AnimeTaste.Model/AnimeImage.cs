@@ -23,31 +23,31 @@ namespace AnimeTaste.Model
         /// <summary>
         /// 图片类型
         /// </summary>
-        [SugarColumn(ColumnDescription = "图片类型")]
+        [SugarColumn(ColumnDescription = "图片类型", IsNullable = true)]
         public string? ImageType { get; set; }
 
         /// <summary>
         /// 文件后缀
         /// </summary>
-        [SugarColumn(ColumnDescription = "文件后缀")]
+        [SugarColumn(ColumnDescription = "文件后缀", IsNullable = true)]
         public string? Suffix { get; set; }
 
         /// <summary>
         /// 远程地址
         /// </summary>
-        [SugarColumn(ColumnDescription = "远程地址")]
+        [SugarColumn(ColumnDescription = "远程地址", IsNullable = true)]
         public string? RemoteUrl { get; set; }
 
         /// <summary>
         /// 存储地址
         /// </summary>
-        [SugarColumn(ColumnDescription = "存储地址")]
+        [SugarColumn(ColumnDescription = "存储地址", IsNullable = true)]
         public string? StorageUrl { get; set; }
 
         /// <summary>
         /// 存储类型
         /// </summary>
-        [SugarColumn(ColumnDescription = "存储类型")]
+        [SugarColumn(ColumnDescription = "存储类型", IsNullable = true)]
         public string? StorageType { get; set; }
     }
 }

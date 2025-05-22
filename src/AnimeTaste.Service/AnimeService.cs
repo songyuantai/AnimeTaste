@@ -45,6 +45,7 @@ namespace AnimeTaste.Service
                 var entity = await db.Queryable<AnimeImage>().Where(m => m.AnimeId == anime.Id && m.ImageType == image.ImageType).FirstAsync();
                 if (null == entity)
                 {
+                    image.AnimeId = anime.Id;
                     await db.Insertable(image).ExecuteCommandIdentityIntoEntityAsync();
                 }
                 else
@@ -70,7 +71,7 @@ namespace AnimeTaste.Service
             foreach (var genre in genres)
             {
                 var entity = await db.Queryable<Genre>()
-                    .Where(m => m.Name == genre.Name && m.Type == genre.Type)
+                    .Where(m => m.Name == genre.Name)
                     .FirstAsync();
 
                 if (null == entity)

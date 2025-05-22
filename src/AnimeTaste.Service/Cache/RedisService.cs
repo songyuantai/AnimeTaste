@@ -15,7 +15,7 @@ namespace AnimeTaste.Service.Cache
         /// <param name="key"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public async Task<bool> ListAdd<T>(string key, params List<T> list) where T : class
+        public async Task<bool> ListAddAsync<T>(string key, params List<T> list) where T : class
         {
             foreach (var item in list)
             {
@@ -32,7 +32,7 @@ namespace AnimeTaste.Service.Cache
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<List<T>> ListGet<T>(string key, int start = 0, int end = -1) where T : class
+        public async Task<List<T>> ListGetAsync<T>(string key, int start = 0, int end = -1) where T : class
         {
             var list = await db.ListRangeAsync(key, start, end);
             return [.. list.SelectNotNull(x => x.ToString().ToObject<T>())];
@@ -45,7 +45,7 @@ namespace AnimeTaste.Service.Cache
         /// <param name="key"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public async Task<bool> ListReplace<T>(string key, List<T> list) where T : class
+        public async Task<bool> ListReplaceAsync<T>(string key, List<T> list, CancellationToken token) where T : class
         {
             if (await db.KeyExistsAsync(key))
             {
@@ -54,7 +54,7 @@ namespace AnimeTaste.Service.Cache
                     return false;
                 }
             }
-            return await ListAdd(key, list);
+            return await ListAddAsync(key, list);
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using AnimeTaste.Core.Utils;
 using AnimeTaste.Model;
 using AnimeTaste.Service.Cache;
+using AnimeTaste.ViewModel;
 using JikanDotNet;
 using SqlSugar;
 using Anime = AnimeTaste.Model.Anime;
@@ -15,7 +16,7 @@ namespace AnimeTaste.Service
         {
             const string SeasonKey = "animeSeason";
             var seasons = GetAllSeasons();
-            var list = await redis.ListGet<Season>(SeasonKey);
+            var list = await redis.ListGetAsync<Season>(SeasonKey);
             //缓存命中
             if (seasons.Count == list.Count && seasons.Last()?.StartDate == list.Last()?.StartDate)
             {
@@ -40,51 +41,48 @@ namespace AnimeTaste.Service
             //删除缓存
             await redis.KeyDeleteAsync(SeasonKey);
 
-            await redis.ListAdd(SeasonKey, list);
+            await redis.ListAddAsync(SeasonKey, list);
 
             return list;
         }
 
-        public async Task<List<Anime>> GetOrAddSeasonAnimeList(int seasonId, int dayOfWeek)
+        public async Task<List<AnimeScheduleInfo>> GetOrAddSeasonAnimeList(int seasonId, int dayOfWeek)
         {
-            const string DayAnimeList = "dayAnimeList";
-            var key = $"{DayAnimeList}:{seasonId}:{dayOfWeek}";
-            if (seasonId == 0 || dayOfWeek < 1 || dayOfWeek > 7) return [];
+            const string AnimeScheduleList = "AnimeScheduleList";
+            var key = $"{AnimeScheduleList}:{seasonId}:{dayOfWeek}";
+            if (seasonId == 0 || dayOfWeek < 0 || dayOfWeek > 6) return [];
 
             //var list = await redis.ScanEntityList<Anime>(key);
-            var list = await redis.ListGet<Anime>(key);
+            var list = await redis.ListGetAsync<AnimeScheduleInfo>(key);
             if (list.Count == 0)
             {
-                list = await db.Queryable<Anime>()
+                var animes = await db.Queryable<Anime>()
                     .Where(m => m.SeasonId == seasonId && m.BroadcastDay == dayOfWeek)
                     .ToListAsync();
 
-                if (list.Count == 0)
+                if (animes.Count == 0)
                 {
-                    var animes = await AddOrUpdateSeasonAnimes(seasonId);
-                    foreach (var g in animes.GroupBy(m => m.BroadcastDay))
-                    {
-                        var groupKey = $"{DayAnimeList}:{seasonId}:{g.Key}";
-                        var gorupList = g.ToList();
-                        await redis.ListReplace(groupKey, gorupList);
-                        if (g.Key == dayOfWeek)
-                        {
-                            list = gorupList;
-                        }
-                    }
+                    list = await AddOrUpdateSeasonAnimes(seasonId, dayOfWeek);
                 }
                 else
                 {
-                    await redis.ListAdd(key, list);
+                    foreach (var anime in animes)
+                    {
+                        var images = await db.Queryable<AnimeImage>().Where(m => m.AnimeId == anime.Id).ToListAsync();
+                        list.Add(ToAnimeSchedule(anime, images, dayOfWeek));
+                    }
                 }
+
+                if (animes.Count > 0)
+                    await redis.ListAddAsync(key, list);
             }
 
             return list;
         }
 
-        private async Task<List<Anime>> AddOrUpdateSeasonAnimes(int seasonId)
+        private async Task<List<AnimeScheduleInfo>> AddOrUpdateSeasonAnimes(int seasonId, int dayOfWeek)
         {
-            List<Anime> list = [];
+            List<AnimeScheduleInfo> list = [];
             var season = await db.Queryable<Season>().Where(m => m.Id == seasonId).FirstAsync();
             if (null == season) return list;
 
@@ -106,7 +104,10 @@ namespace AnimeTaste.Service
                         await animeService.AddOrUpdateAnime(anime);
                         await animeService.AddOrUpdateAnimeImages(anime, images);
                         await animeService.AddOrUpdateAnimeGenres(anime, source.Genres);
-                        list.Add(anime);
+                        if (dayOfWeek == anime.BroadcastDay)
+                        {
+                            list.Add(ToAnimeSchedule(anime, images, dayOfWeek));
+                        }
 
                     }
                     await db.Ado.CommitTranAsync();
@@ -118,15 +119,26 @@ namespace AnimeTaste.Service
                 }
 
                 await Task.Delay(200);
-
                 page++;
+
+                //break;
             }
 
             return list;
         }
 
+        private static string GetAnimeImageUrl(List<AnimeImage> images)
+        {
+            var image = images.FirstOrDefault(m => m.ImageType == AnimeImageType.DEFAULT) ?? images.FirstOrDefault();
+            if (image == null) return string.Empty;
+
+            return !string.IsNullOrEmpty(image.StorageUrl) ? $"image/anime_cover/{image.AnimeId}" :
+                image.RemoteUrl ?? string.Empty;
+        }
+
         private static (Anime, List<AnimeImage>) ToSysAnime(JikanDotNet.Anime source, int seasonId)
         {
+            var day = source.Broadcast.Day?.Replace("days", "day") ?? string.Empty;
             //images  genres
             Anime anime = new()
             {
@@ -137,11 +149,12 @@ namespace AnimeTaste.Service
                 Status = GetAnimeStatus(source.Status),
                 AiringDate = source.Aired.From,
                 AiriedDate = source.Aired.To,
-                BroadcastDay = ConvUtil.AsEnumValue<DayOfWeek>(source.Broadcast.Day),
+                BroadcastDay = ConvUtil.AsEnumValue<DayOfWeek>(day),
                 BroadcastTime = source.Broadcast.Time,
                 EpisodeCount = source.Episodes,
                 Scroe = source.Score,
                 Rank = source.Rank,
+                Rating = source.Rating,
                 CreateTime = DateTime.Now,
             };
 
@@ -154,6 +167,18 @@ namespace AnimeTaste.Service
             TryAddImage(images, source.Images.JPG.LargeImageUrl, AnimeImageType.LARGE, JPG);
 
             return (anime, images);
+        }
+
+        private static AnimeScheduleInfo ToAnimeSchedule(Anime anime, List<AnimeImage> images, int dayOfWeek)
+        {
+            return new()
+            {
+                Title = anime.Name ?? string.Empty,
+                AnimeId = anime.Id,
+                DayOfWeek = dayOfWeek,
+                ImageUrl = GetAnimeImageUrl(images),
+                Score = anime.Scroe ?? 0
+            };
         }
 
         private static void TryAddImage(List<AnimeImage> list, string url, string imageType, string suffix)

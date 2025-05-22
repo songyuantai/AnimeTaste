@@ -84,6 +84,17 @@ namespace AnimeTaste.WebApi
             return await GetAsync<List<LabeledValue>>("season/season_list_option", true) ?? [];
         }
 
+        /// <summary>
+        /// 获取季度番剧日程列表
+        /// </summary>
+        /// <param name="seasonId"></param>
+        /// <param name="dayofWeek"></param>
+        /// <returns></returns>
+        public async Task<List<AnimeScheduleInfo>> GetAnimeScheduleList(int seasonId, int dayofWeek)
+        {
+            return await GetAsync<List<AnimeScheduleInfo>>($"season/anime_schedule_list?seasonId={seasonId}&dayofWeek={dayofWeek}", true) ?? [];
+        }
+
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase

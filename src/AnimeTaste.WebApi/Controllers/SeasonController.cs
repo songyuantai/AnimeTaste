@@ -1,4 +1,5 @@
 ﻿using AnimeTaste.Service;
+using AnimeTaste.ViewModel;
 using AnimeTaste.ViewModel.Ui;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,12 @@ namespace AnimeTaste.WebApi.Controllers
             return data;
         }
 
-
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("anime_schedule_list")]
+        public async Task<List<AnimeScheduleInfo>> GetAnimeScheduleInfoList(int seasonId, int dayOfWeek)
+        {
+            return await seasonService.GetOrAddSeasonAnimeList(seasonId, dayOfWeek);
+        }
     }
 }

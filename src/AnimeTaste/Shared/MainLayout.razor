@@ -31,8 +31,6 @@
     </Sider>
     <Layout Class="site-layout">
         <Header Class="site-layout-background" Style="padding: 0;">
-
-
             <div style="display:flex;justify-content:space-between">
                 <div>
                     @if (collapsed)
@@ -57,10 +55,8 @@
                     </AuthorizeView>
                 </div>
             </div>
-           
-
         </Header>
-        <Content Class="site-layout-background" Style="margin: 24px 16px;padding: 24px;min-height: 280px;">
+        <Content Class="site-layout-background" Style="margin: 24px 16px;padding: 24px;min-height: 280px; overflow-y:auto">
             @Body
         </Content>
     </Layout>
