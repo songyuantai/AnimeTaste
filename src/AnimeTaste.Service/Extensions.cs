@@ -32,6 +32,7 @@ namespace AnimeTaste.Service
             services.AddScoped<UserService>();
             services.AddScoped<RedisService>();
             services.AddScoped<SeasonService>();
+            services.AddScoped<AnimeService>();
         }
 
         public static string ToJson<T>(this T obj)

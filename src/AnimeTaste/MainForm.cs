@@ -2,6 +2,7 @@ using AnimeTaste.Auth;
 using AnimeTaste.Client;
 using AnimeTaste.Core;
 using AnimeTaste.Core.Const;
+using AnimeTaste.Core.Utils;
 using AnimeTaste.Service;
 using AnimeTaste.WebApi;
 using Blazored.LocalStorage;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Diagnostics;
 
 namespace AnimeTaste
 {
@@ -44,8 +46,8 @@ namespace AnimeTaste
             mainBlazorWebView.Services = services.BuildServiceProvider();
             Core.App.SetProvider(mainBlazorWebView.Services);
 
-            //var data = Core.App.Resolve<Ai>()!.TranslateToChinese("Hello World!");
-            //Debug.WriteLine(data);
+            var data = Core.App.Resolve<Ai>()!.TranslateToChinese("Hello World!");
+            Debug.WriteLine(data);
 
             mainBlazorWebView.UrlLoading += (sender, urlLoadingEventArgs) =>
             {

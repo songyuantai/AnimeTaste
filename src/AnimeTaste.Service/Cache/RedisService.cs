@@ -1,4 +1,5 @@
-﻿using Dm.util;
+﻿using AnimeTaste.Core;
+using Dm.util;
 using StackExchange.Redis;
 
 namespace AnimeTaste.Service.Cache

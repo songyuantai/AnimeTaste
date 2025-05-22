@@ -65,15 +65,15 @@ namespace AnimeTaste.Service
                     foreach (var g in animes.GroupBy(m => m.BroadcastDay))
                     {
                         var groupKey = $"{DayAnimeList}:{seasonId}:{g.Key}";
-                        await redis.ListReplace(groupKey, g.ToList());
+                        var gorupList = g.ToList();
+                        await redis.ListReplace(groupKey, gorupList);
                         if (g.Key == dayOfWeek)
                         {
-                            list = [.. g];
+                            list = gorupList;
                         }
                     }
                 }
-
-                if (list.Count > 0)
+                else
                 {
                     await redis.ListAdd(key, list);
                 }

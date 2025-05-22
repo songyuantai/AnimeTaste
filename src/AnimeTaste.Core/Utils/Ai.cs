@@ -36,18 +36,32 @@ namespace AnimeTaste.Core.Utils
             functionDescription: "获取当前的时间"
         );
 
-        private string GetCurrentDate() => DateTime.Now.ToString("yyyy年MM月dd日");
+        private static string GetCurrentDate() => DateTime.Now.ToString("yyyy年MM月dd日");
 
-        private string GetCurrentTime() => DateTime.Now.ToString("HH:mm:ss");
+        private static string GetCurrentTime() => DateTime.Now.ToString("HH:mm:ss");
 
         public string TranslateToChinese(string text)
         {
-            var content = $"请将下列单词或句子翻译为中文，勿换行，不解释，但是保留标点符号，直接给结果\n{text}/no_think";
+            var systemPrompt = ChatMessage.CreateSystemMessage("你是一个专业的翻译人员，请将用户给出的单词、短语或句子翻译为中文，直接给出结果，保留原标点符号或添加合理的中文标点符号/no_think");
+            var userPrompt = ChatMessage.CreateUserMessage(text);
 
+            //BinaryData functionParameters = BinaryData.FromBytes("""
+            //                 {
+            //                     "type": "object",
+            //                    "properties": {
+            //                        "order_id": {
+            //                             "type": "string",
+            //                             "description": "The customer's order ID."
+            //                         }
+            //                     },
+            //                     "required": ["order_id"],
+            //                     "additionalProperties": false,
+            //                 }
+            //                 """u8.ToArray());
             var options = new ChatCompletionOptions() { Tools = { GetCurrentDateTool, GetCurrentTimeTool } };
 
             //"今天几月几号？"，"现在几点了？"
-            var completion = _client.CompleteChat([text], options);
+            var completion = _client.CompleteChat([systemPrompt, userPrompt], options);
 
             if (completion.Value.ToolCalls.Count > 0)
             {
@@ -55,14 +69,14 @@ namespace AnimeTaste.Core.Utils
                 {
                     if (item.FunctionName == nameof(GetCurrentTime))
                     {
-                        var message = "工具调用结果：" + GetCurrentTime();
+                        var message = ChatMessage.CreateToolMessage(item.Id, GetCurrentTime());
                         completion = _client.CompleteChat([message], options);
                         break;
                     }
 
                     if (item.FunctionName == nameof(GetCurrentDate))
                     {
-                        var message = "工具调用结果：" + GetCurrentDate();
+                        var message = ChatMessage.CreateToolMessage(item.Id, GetCurrentDate()); ;
                         completion = _client.CompleteChat([message], options);
                         break;
                     }

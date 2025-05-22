@@ -72,7 +72,7 @@ namespace AnimeTaste.WebApi
         /// <returns></returns>
         public async Task<Result<List<SelectOption>>?> GetSystemRoleOptions()
         {
-            return await GetAsync<Result<List<SelectOption>>>("common/SystemRoleOptions", true);
+            return await GetAsync<Result<List<SelectOption>>>("common/system_role_options", true);
         }
 
         /// <summary>

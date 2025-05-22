@@ -14,7 +14,7 @@ namespace AnimeTaste.WebApi.Controllers
     {
         [HttpGet]
         [AllowAnonymous]
-        [Route("SystemRoleOptions")]
+        [Route("system_role_options")]
         public async Task<Result<List<SelectOption>>> GetSystemRoleSelectOptions()
         {
             var list = (await db.Queryable<SystemRole>().ToListAsync())
