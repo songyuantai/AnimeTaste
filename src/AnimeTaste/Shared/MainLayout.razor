@@ -2,32 +2,42 @@
 <Layout Style="height:100vh">
     <Sider @bind-Collapsed=@collapsed NoTrigger>
         <h4 class="logo">A & T</h4>
-        <Menu Theme="MenuTheme.Dark" Mode="MenuMode.Inline" DefaultSelectedKeys=@(new[]{"1"})>
-            <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All">
-                <Icon Type="home" Theme="IconThemeType.Outline" />
-                <span>首页</span>
-            </MenuItem>
-            <MenuItem Key="2" RouterLink="/anime_schedule" RouterMatch="NavLinkMatch.All">
-                <Icon Type="schedule" Theme="IconThemeType.Outline" />
-                <span>时间表</span>
-            </MenuItem>
-            <MenuItem Key="3">
-                <Icon Type="heart" Theme="IconThemeType.Outline" />
-                <span>收藏</span>
-            </MenuItem>
-            <MenuItem Key="4">
-                <Icon Type="database" Theme="IconThemeType.Outline" />
-                <span>存储库</span>
-            </MenuItem>
-            <MenuItem Key="5">
-                <Icon Type="fire" Theme="IconThemeType.Outline" />
-                <span>排行榜</span>
-            </MenuItem>
-            <MenuItem Key="6">
-                <Icon Type="play-circle" Theme="IconThemeType.Outline" />
-                <span>播放器</span>
-            </MenuItem>
-        </Menu>
+        <Flex Direction="FlexDirection.Vertical" Justify="FlexJustify.SpaceBetween" Style="height: calc(100vh - 80px)">
+            <Menu @ref="menu" Theme="MenuTheme.Dark" Mode="MenuMode.Inline" DefaultSelectedKeys=@(new[]{"1"})>
+                <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="home" Theme="IconThemeType.Outline" />
+                    <span>首页</span>
+                </MenuItem>
+                <MenuItem Key="2" RouterLink="/anime_schedule" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="schedule" Theme="IconThemeType.Outline" />
+                    <span>时间表</span>
+                </MenuItem>
+                <MenuItem Key="3">
+                    <Icon Type="heart" Theme="IconThemeType.Outline" />
+                    <span>收藏</span>
+                </MenuItem>
+                <MenuItem Key="4">
+                    <Icon Type="database" Theme="IconThemeType.Outline" />
+                    <span>存储库</span>
+                </MenuItem>
+                <MenuItem Key="5">
+                    <Icon Type="fire" Theme="IconThemeType.Outline" />
+                    <span>排行榜</span>
+                </MenuItem>
+                <MenuItem Key="6">
+                    <Icon Type="play-circle" Theme="IconThemeType.Outline" />
+                    <span>播放器</span>
+                </MenuItem>
+            </Menu>
+
+            <Menu Theme="MenuTheme.Dark" Mode="MenuMode.Inline" Selectable="false">
+                <MenuItem Key="0">
+                    <Icon Type="setting" Theme="IconThemeType.Outline" />
+                    <span>设置</span>
+                </MenuItem>
+            </Menu>
+        </Flex>
+
     </Sider>
     <Layout Class="site-layout">
         <Header Class="site-layout-background" Style="padding: 0;">
@@ -96,9 +106,13 @@
 @code {
     bool collapsed = true;
 
+    private Menu? menu;
+
     void toggle()
     {
         collapsed = !collapsed;
+        if(menu is not null)
+            menu.InlineCollapsed = collapsed;
     }
 
     private string authMessage = "The user is NOT authenticated.";

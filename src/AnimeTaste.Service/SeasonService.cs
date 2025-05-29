@@ -87,7 +87,8 @@ namespace AnimeTaste.Service
             if (null == season) return list;
 
             var seasonOfYear = GetSeaonOfYear(season.SeasonOfYear ?? "");
-            var year = seasonOfYear == JikanDotNet.Season.Winter ? season.Year - 1 : season.Year;
+            //var year = seasonOfYear == JikanDotNet.Season.Winter ? season.Year + 1 : season.Year;
+            var year = season.Year;
             var page = 1;
             while (true)
             {

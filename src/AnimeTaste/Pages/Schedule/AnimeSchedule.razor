@@ -1,6 +1,7 @@
 ﻿@using AnimeTaste.ViewModel
 @using AnimeTaste.ViewModel.Ui
 @using AnimeTaste.WebApi
+@using System.Runtime.InteropServices
 @page "/anime_schedule"
 @inject ApiClient api;
 @{
@@ -12,32 +13,37 @@
 }
 
 <Tabs @bind-ActiveKey="@activeKey" OnChange="OnTabChange" Animated>
+
     <ChildContent>
+
         @foreach (var index in INDEXS)
         {
             <TabPane Tab="@GetWeekOfDayName(index)" Key="@index.ToString()">
-                <Row Gutter="24">
-                    @foreach (var schedule in schedules[index])
-                    {
-                        <AntDesign.Col Xs="@xs" Sm="@sm" Md="md" Lg="lg" Xl="xl" Style="margin-top:8px; margin-bottom:8px">
-                            <Card Hoverable Bordered Cover="GetCoverTemplate(schedule.ImageUrl)">
-                                <ChildContent>
-                                    <CardMeta Title="@schedule.Title" />
-                                </ChildContent>
-                                <ActionTemplate>
-                                    <CardAction><Icon Type="heart" Theme="IconThemeType.Outline" /></CardAction>
-                                    <CardAction><Icon Type="heart" Theme="IconThemeType.Fill" Style="color:#eb2f96" /></CardAction>
-                                    <CardAction><Icon Type="ellipsis" /></CardAction>
+                <Skeleton Loading="@loading" Active>
+                    <Row Gutter="24">
+                        @foreach (var schedule in schedulesDic[_selectedValue][index])
+                        {
+                            <AntDesign.Col Xs="@xs" Sm="@sm" Md="md" Lg="lg" Xl="xl" Style="margin-top:8px; margin-bottom:8px">
+                                <Card Hoverable Bordered Cover="GetCoverTemplate(schedule.ImageUrl)">
+                                    <ChildContent>
+                                        <CardMeta Title="@schedule.Title" />
+                                    </ChildContent>
+                                    <ActionTemplate>
+                                        <CardAction><Icon Type="heart" Theme="IconThemeType.Outline" /></CardAction>
+                                        <CardAction><Icon Type="heart" Theme="IconThemeType.Fill" Style="color:#eb2f96" /></CardAction>
+                                        <CardAction>@schedule.Score</CardAction>
+@*                                         <Icon Type="ellipsis" /> *@
+                                    </ActionTemplate>
+                                </Card>
+                            </AntDesign.Col>
+                        }
 
-                                </ActionTemplate>
-                            </Card>
-                        </AntDesign.Col>
-                    }
-
-                    <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-                </Row>
+                        <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+                    </Row>
+                </Skeleton>
             </TabPane>
         }
+
     </ChildContent>
     <TabBarExtraContent>
         <InputGroup Compact>
@@ -66,47 +72,53 @@
 <style>
 
     .card-cover-container {
-        position: relative;
-        width: 100%;
-        padding-top: 150%; 
-        overflow: hidden;
-        background: #f5f5f5;
+    position: relative;
+    width: 100%;
+    padding-top: 150%; 
+    overflow: hidden;
+    background: #f5f5f5;
     }
 
     .card-cover-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
     }
 
     .card-cover-container:hover .card-cover-image {
-        transform: scale(1.05);
+    transform: scale(1.05);
     }
 
     .ant-card-body {
-        flex: 1;
+    flex: 1;
     }
 </style>
 
 @code {
-    private string activeKey { get; set; } = "1";
+
+    private string activeKey { get; set; } = ((int)DateTime.Now.DayOfWeek).ToString();
 
     private List<LabeledValue> _options = [];
 
-    private List<AnimeScheduleInfo>[] schedules = [[], [], [] ,[], [], [], []];
+    private Dictionary<string, List<AnimeScheduleInfo>[]> schedulesDic = new();
 
     private static readonly int[] INDEXS = [1, 2, 3, 4, 5, 6, 0];
 
-    private string _selectedValue = "";
+    //特殊处理空值
+    private const string EMPTY_SEASON_ID = "-1";
+
+    private string _selectedValue = EMPTY_SEASON_ID;
 
     private Select<string, LabeledValue>? seasonSelect;
 
     private static RenderFragment GetCoverTemplate(string src) =>
     @<div class="card-cover-container"><img src = "@src" class="card-cover-image" /></div>;
+
+    private bool loading = false;
 
     private static string GetWeekOfDayName(int index) =>
     index switch
@@ -136,7 +148,7 @@
         list.Reverse();
         _options.AddRange(list);
 
-        _selectedValue = _options.FirstOrDefault()?.Value ?? "";
+        _selectedValue = _options.FirstOrDefault()?.Value ?? EMPTY_SEASON_ID;
 
         await LoadScheduleList();
 
@@ -148,14 +160,29 @@
         await LoadScheduleList();
     }
 
+    private List<AnimeScheduleInfo>[] GetOrAddAnimeSchedules(string seasonId)
+    {
+        if (string.IsNullOrEmpty(seasonId)) throw new ArgumentNullException(seasonId);
+
+        ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(schedulesDic, seasonId, out var exists);
+        if (!exists) 
+            value = [[], [], [], [], [], [], []];
+        return value!;
+    }
+
     private async Task LoadScheduleList()
     {
         if (int.TryParse(activeKey, out int dayOfWeek) && int.TryParse(_selectedValue, out int id))
         {
+            var schedules = GetOrAddAnimeSchedules(_selectedValue);
             if(schedules[dayOfWeek].Count == 0)
             {
+                loading = true;
                 var data = await api.GetAnimeScheduleList(id, dayOfWeek);
+                loading = false;
+
                 schedules[dayOfWeek].AddRange(data);
+                this.StateHasChanged();
             }
         }
     }
