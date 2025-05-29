@@ -38,7 +38,7 @@ namespace AnimeTaste.WebApi
             });
 
             //sugarsql
-            builder.Services.AddSugarSql("server=localhost;userid=root;password=root;database=anime;AllowLoadLocalInfile=true");
+            builder.Services.AddSugarSql(configuration["MySql:ConnectString"]);
 
             //minio
             builder.Services.AddMinio(minioClient => minioClient

@@ -8,21 +8,19 @@ namespace AnimeTaste.Service
 {
     public static class Extensions
     {
-        public static void AddSugarSql(this IServiceCollection services, string connectString)
+        public static void AddSugarSql(this IServiceCollection services, string? connectString)
         {
-            //注册上下文：AOP里面可以获取IOC对象，如果有现成框架比如Furion可以不写这一行
-            //services.AddHttpContextAccessor();
-            //注册SqlSugar用AddScoped
+            if (string.IsNullOrWhiteSpace(connectString)) throw new ArgumentNullException(nameof(connectString));
+
             services.AddScoped<ISqlSugarClient>(s =>
             {
-                //Scoped用SqlSugarClient 
-                SqlSugarClient sqlSugar = new(new ConnectionConfig()
+                SqlSugarClient sqlSugarClient = new(new ConnectionConfig()
                 {
                     DbType = DbType.MySql,
                     ConnectionString = connectString,
                     IsAutoCloseConnection = true,
                 });
-                return sqlSugar;
+                return sqlSugarClient;
             });
         }
 

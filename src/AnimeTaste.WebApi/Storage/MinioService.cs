@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.StaticFiles;
+﻿using AnimeTaste.Core.Utils;
+using Microsoft.AspNetCore.StaticFiles;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
@@ -70,12 +71,12 @@ namespace AnimeTaste.WebApi.Storage
                     Directory.CreateDirectory(folderPath);
                 }
 
-                StatObjectArgs statObjectArgs = new StatObjectArgs()
+                var statObjectArgs = new StatObjectArgs()
                                                     .WithBucket(bucketName)
                                                     .WithObject(objectName);
                 await minioClient.StatObjectAsync(statObjectArgs);
 
-                GetObjectArgs getObjectArgs = new GetObjectArgs()
+                var getObjectArgs = new GetObjectArgs()
                                                   .WithBucket(bucketName)
                                                   .WithObject(objectName)
                                                   .WithFile(folderPath + objectName);
@@ -100,7 +101,7 @@ namespace AnimeTaste.WebApi.Storage
                     return false;
                 }
 
-                RemoveObjectArgs removeObjectArgs = new RemoveObjectArgs()
+                var removeObjectArgs = new RemoveObjectArgs()
                                 .WithBucket(bucketName)
                                 .WithObject(objectName);
                 await minioClient.RemoveObjectAsync(removeObjectArgs);
@@ -119,7 +120,7 @@ namespace AnimeTaste.WebApi.Storage
         {
             try
             {
-                PresignedGetObjectArgs args = new PresignedGetObjectArgs()
+                var args = new PresignedGetObjectArgs()
                         .WithBucket(bucketName)
                         .WithObject(objectName)
                         .WithExpiry(expiry);

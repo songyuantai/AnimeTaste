@@ -4,147 +4,40 @@
 @page "/anime_schedule"
 @inject ApiClient api;
 @{
-    const int span = 4;
-    const int column = 6;
+    const int xs = 24;
+    const int sm = 8;
+    const int md = 6;
+    const int lg = 4;
+    const int xl = 4;
 }
 
 <Tabs @bind-ActiveKey="@activeKey" OnChange="OnTabChange" Animated>
-
     <ChildContent>
-        <TabPane Tab="周一" Key="1">
-            <Row Gutter="24">
-                @foreach (var schedule in schedules[1])
-                {
-                    <AntDesign.Col Span="span" Style="margin-top:8px; margin-bottom:8px">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
+        @foreach (var index in INDEXS)
+        {
+            <TabPane Tab="@GetWeekOfDayName(index)" Key="@index.ToString()">
+                <Row Gutter="24">
+                    @foreach (var schedule in schedules[index])
+                    {
+                        <AntDesign.Col Xs="@xs" Sm="@sm" Md="md" Lg="lg" Xl="xl" Style="margin-top:8px; margin-bottom:8px">
+                            <Card Hoverable Bordered Cover="GetCoverTemplate(schedule.ImageUrl)">
+                                <ChildContent>
+                                    <CardMeta Title="@schedule.Title" />
+                                </ChildContent>
+                                <ActionTemplate>
+                                    <CardAction><Icon Type="heart" Theme="IconThemeType.Outline" /></CardAction>
+                                    <CardAction><Icon Type="heart" Theme="IconThemeType.Fill" Style="color:#eb2f96" /></CardAction>
+                                    <CardAction><Icon Type="ellipsis" /></CardAction>
 
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-            </Row>
-        </TabPane>
-        <TabPane Tab="周二" Key="2">
-            <Row Gutter="24">
-                @foreach (var schedule in schedules[2])
-                {
-                    <AntDesign.Col Span="span" Style="margin:8px auto">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
+                                </ActionTemplate>
+                            </Card>
+                        </AntDesign.Col>
+                    }
 
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-
-            </Row>
-        </TabPane>
-        <TabPane Tab="周三" Key="3">
-            <Row Gutter="24">
-                @foreach (var schedule in schedules[3])
-                {
-                    <AntDesign.Col Span="span" Style="margin:8px auto">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
-
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-            </Row>
-        </TabPane>
-        <TabPane Tab="周四" Key="4">
-            <Row Gutter="16">
-                @foreach (var schedule in schedules[4])
-                {
-                    <AntDesign.Col Span="span" Style="margin:8px auto">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
-
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-            </Row>
-        </TabPane>
-        <TabPane Tab="周五" Key="5">
-            <Row Gutter="16">
-                @foreach (var schedule in schedules[5])
-                {
-                    <AntDesign.Col Span="span" Style="margin:8px auto">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
-
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-            </Row>
-        </TabPane>
-        <TabPane Tab="周六" Key="6">
-            <Row Gutter="16">
-                @foreach (var schedule in schedules[6])
-                {
-                    <AntDesign.Col Span="span" Style="margin:8px auto">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
-
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-            </Row>
-        </TabPane>
-        <TabPane Tab="周日" Key="0">
-            <Row Gutter="16">
-                @foreach (var schedule in schedules[0])
-                {
-                    <AntDesign.Col Span="span" Style="margin:8px auto">
-                        <Card Hoverable Bordered>
-                            <Cover>
-                                <Image Src="@schedule.ImageUrl"></Image>
-                            </Cover>
-                            <Body>
-                                <CardMeta Title="@schedule.Title" />
-                            </Body>
-                        </Card>
-                    </AntDesign.Col>
-                }
-
-                <AntDesign.Col Flex=@("auto")></AntDesign.Col>
-            </Row>
-        </TabPane>
+                    <AntDesign.Col Flex=@("auto")></AntDesign.Col>
+                </Row>
+            </TabPane>
+        }
     </ChildContent>
     <TabBarExtraContent>
         <InputGroup Compact>
@@ -170,17 +63,63 @@
     </TabBarExtraContent>
 </Tabs>
 
+<style>
+
+    .card-cover-container {
+        position: relative;
+        width: 100%;
+        padding-top: 150%; 
+        overflow: hidden;
+        background: #f5f5f5;
+    }
+
+    .card-cover-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .card-cover-container:hover .card-cover-image {
+        transform: scale(1.05);
+    }
+
+    .ant-card-body {
+        flex: 1;
+    }
+</style>
+
 @code {
-    string activeKey { get; set; } = "1";
+    private string activeKey { get; set; } = "1";
 
-    List<LabeledValue> _options = [];
+    private List<LabeledValue> _options = [];
 
-    List<AnimeScheduleInfo>[] schedules = [[], [], [] ,[], [], [], []];
+    private List<AnimeScheduleInfo>[] schedules = [[], [], [] ,[], [], [], []];
 
-    string _selectedValue = "";
+    private static readonly int[] INDEXS = [1, 2, 3, 4, 5, 6, 0];
 
+    private string _selectedValue = "";
 
-    Select<string, LabeledValue>? seasonSelect;
+    private Select<string, LabeledValue>? seasonSelect;
+
+    private static RenderFragment GetCoverTemplate(string src) =>
+    @<div class="card-cover-container"><img src = "@src" class="card-cover-image" /></div>;
+
+    private static string GetWeekOfDayName(int index) =>
+    index switch
+    {
+        0 => "周日",
+        1 => "周一",
+        2 => "周二",
+        3 => "周三",
+        4 => "周四",
+        5 => "周五",
+        6 => "周六",
+        _ => string.Empty,
+    };
 
     async Task OnTabChange(string key)
     {

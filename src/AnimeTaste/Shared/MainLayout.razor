@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 <Layout Style="height:100vh">
-    <Sider @bind-Collapsed=@collapsed NoTrigger OnCollapse="OnCollapse">
+    <Sider @bind-Collapsed=@collapsed NoTrigger>
         <h4 class="logo">A & T</h4>
         <Menu Theme="MenuTheme.Dark" Mode="MenuMode.Inline" DefaultSelectedKeys=@(new[]{"1"})>
             <MenuItem Key="1" RouterLink="/" RouterMatch="NavLinkMatch.All">
@@ -56,7 +56,13 @@
                 </div>
             </div>
         </Header>
-        <Content Class="site-layout-background" Style="margin: 24px 16px;padding: 24px;min-height: 280px; overflow-y:auto">
+
+        <Content Class="site-layout-background" Style="margin: 24px 16px;padding: 24px; padding-top:0px; min-height: 280px; overflow-y:auto">
+            @*             <Breadcrumb Style="margin: 8px 0;">
+                <BreadcrumbItem>Home</BreadcrumbItem>
+                <BreadcrumbItem>List</BreadcrumbItem>
+                <BreadcrumbItem>App</BreadcrumbItem>
+            </Breadcrumb> *@
             @Body
         </Content>
     </Layout>
@@ -64,40 +70,35 @@
 
 <style>
     #components-layout-demo-custom-trigger .trigger {
-        font-size: 18px;
-        line-height: 64px;
-        padding: 0 24px;
-        cursor: pointer;
-        transition: color 0.3s;
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
     }
 
-        #components-layout-demo-custom-trigger .trigger:hover {
-            color: #1890ff;
-        }
+    #components-layout-demo-custom-trigger .trigger:hover {
+    color: #1890ff;
+    }
 
     #components-layout-demo-custom-trigger .logo {
-        height: 32px;
-        background: rgba(255, 255, 255, 0.2);
-        margin: 16px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
     }
 
     .site-layout .site-layout-background {
-        background: #fff;
+    background: #fff;
     }
 </style>
 
 
 @code {
-    bool collapsed;
+    bool collapsed = true;
 
     void toggle()
     {
         collapsed = !collapsed;
-    }
-
-    void OnCollapse(bool isCollapsed)
-    {
-        Console.WriteLine($"Collapsed: {isCollapsed}");
     }
 
     private string authMessage = "The user is NOT authenticated.";

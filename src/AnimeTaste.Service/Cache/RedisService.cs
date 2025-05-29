@@ -141,7 +141,7 @@ namespace AnimeTaste.Service.Cache
         /// <returns></returns>
         public async Task<List<RedisKey>> ScanKeys(IServer server, string match, int count)
         {
-            List<RedisKey> keys = new List<RedisKey>();
+            List<RedisKey> keys = [];
 
             long cursor = 0;
             do
