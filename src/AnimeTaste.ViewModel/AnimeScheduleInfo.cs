@@ -30,5 +30,9 @@
         /// </summary>
         public int DayOfWeek { get; set; }
 
+        /// <summary>
+        /// 是否收藏
+        /// </summary>
+        public bool IsCollected { get; set; }
     }
 }

@@ -95,6 +95,16 @@ namespace AnimeTaste.WebApi
             return await GetAsync<List<AnimeScheduleInfo>>($"season/anime_schedule_list?seasonId={seasonId}&dayofWeek={dayofWeek}", true) ?? [];
         }
 
+        /// <summary>
+        /// 番剧收藏切换
+        /// </summary>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public async Task<Result<bool>?> AnimeCollectToggle(AnimeCollectOption option)
+        {
+            return await PostAsync<AnimeCollectOption, Result<bool>>("anime/collect", option, true);
+        }
+
         private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase

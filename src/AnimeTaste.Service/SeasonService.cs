@@ -38,17 +38,15 @@ namespace AnimeTaste.Service
                     list.Add(season);
             }
 
-            //删除缓存
-            await redis.KeyDeleteAsync(SeasonKey);
-
-            await redis.ListAddAsync(SeasonKey, list);
+            await redis.ListReplaceAsync(SeasonKey, list);
 
             return list;
         }
 
+        public const string AnimeScheduleList = "AnimeScheduleList";
+
         public async Task<List<AnimeScheduleInfo>> GetOrAddSeasonAnimeList(int seasonId, int dayOfWeek)
         {
-            const string AnimeScheduleList = "AnimeScheduleList";
             var key = $"{AnimeScheduleList}:{seasonId}:{dayOfWeek}";
             if (seasonId == 0 || dayOfWeek < 0 || dayOfWeek > 6) return [];
 
@@ -66,10 +64,15 @@ namespace AnimeTaste.Service
                 }
                 else
                 {
+                    var animeIds = animes.Select(m => m.Id).ToList();
+                    var animeIdCollceted = await db.Queryable<AnimeCollection>().Where(m => animeIds.Contains(m.AnimeId)).Select(m => m.AnimeId).ToArrayAsync();
+                    var animeIdCollcetedSet = animeIdCollceted.ToHashSet();
                     foreach (var anime in animes)
                     {
                         var images = await db.Queryable<AnimeImage>().Where(m => m.AnimeId == anime.Id).ToListAsync();
-                        list.Add(ToAnimeSchedule(anime, images, dayOfWeek));
+                        var item = ToAnimeSchedule(anime, images, dayOfWeek);
+                        item.IsCollected = animeIdCollcetedSet.Contains(item.AnimeId);
+                        list.Add(item);
                     }
                 }
 

@@ -45,7 +45,7 @@ namespace AnimeTaste.Service.Cache
         /// <param name="key"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public async Task<bool> ListReplaceAsync<T>(string key, List<T> list, CancellationToken token) where T : class
+        public async Task<bool> ListReplaceAsync<T>(string key, List<T> list) where T : class
         {
             if (await db.KeyExistsAsync(key))
             {

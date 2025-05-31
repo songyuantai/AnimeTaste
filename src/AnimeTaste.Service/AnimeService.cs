@@ -1,4 +1,6 @@
 ﻿using AnimeTaste.Model;
+using AnimeTaste.Service.Cache;
+using AnimeTaste.ViewModel;
 using SqlSugar;
 
 namespace AnimeTaste.Service
@@ -7,7 +9,7 @@ namespace AnimeTaste.Service
     /// 番剧服务
     /// </summary>
     /// <param name="db"></param>
-    public class AnimeService(ISqlSugarClient db)
+    public class AnimeService(ISqlSugarClient db, RedisService redis)
     {
         /// <summary>
         /// 添加或者更新番剧信息
@@ -99,6 +101,38 @@ namespace AnimeTaste.Service
                         .ExecuteCommandAsync();
                     }
                 }
+            }
+        }
+
+
+        public async Task AnimeCollectToggle(int animeId, int seasonId, int dayOfWeek, bool isCollect)
+        {
+            if (animeId <= 0) return;
+
+            var isCollected = await db.Queryable<AnimeCollection>().Where(m => m.AnimeId == animeId).AnyAsync();
+            if (isCollected && !isCollect)
+            {
+                //取消收藏
+                await db.Deleteable<AnimeCollection>().Where(m => m.AnimeId == animeId).ExecuteCommandAsync();
+            }
+            else if (!isCollected && isCollect)
+            {
+                //收藏
+                var entity = new AnimeCollection
+                {
+                    AnimeId = animeId,
+                    CollectDate = DateTime.Now,
+                };
+                await db.Insertable(entity).ExecuteCommandAsync();
+            }
+
+            var key = $"{SeasonService.AnimeScheduleList}:{seasonId}:{dayOfWeek}";
+            var animeScheduleInfoList = await redis.ListGetAsync<AnimeScheduleInfo>(key);
+            var animeScheduleInfo = animeScheduleInfoList.FirstOrDefault(m => m.AnimeId == animeId);
+            if (animeScheduleInfo != null)
+            {
+                animeScheduleInfo.IsCollected = isCollect;
+                await redis.ListReplaceAsync(key, animeScheduleInfoList);
             }
         }
     }

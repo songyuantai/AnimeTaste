@@ -29,10 +29,20 @@
                                         <CardMeta Title="@schedule.Title" />
                                     </ChildContent>
                                     <ActionTemplate>
-                                        <CardAction><Icon Type="heart" Theme="IconThemeType.Outline" /></CardAction>
-                                        <CardAction><Icon Type="heart" Theme="IconThemeType.Fill" Style="color:#eb2f96" /></CardAction>
-                                        <CardAction>@schedule.Score</CardAction>
-@*                                         <Icon Type="ellipsis" /> *@
+                                        @if (!schedule.IsCollected)
+                                        {
+                                            <CardAction Style="width: 50%">
+                                                <Icon OnClick="@(() => ToggleCollect(schedule))" Type="heart" Theme="IconThemeType.Outline" />
+                                            </CardAction>
+                                        }
+                                        else
+                                        {
+                                            <CardAction Style="width: 50%">
+                                                <Icon OnClick="@(() => ToggleCollect(schedule))" Type="heart" Theme="IconThemeType.Fill" Style="color:#eb2f96" />
+                                            </CardAction>
+                                                
+                                        }
+                                        <CardAction Style="width: 50%">@schedule.Score</CardAction>
                                     </ActionTemplate>
                                 </Card>
                             </AntDesign.Col>
@@ -184,6 +194,23 @@
                 schedules[dayOfWeek].AddRange(data);
                 this.StateHasChanged();
             }
+        }
+    }
+
+    private async Task ToggleCollect(AnimeScheduleInfo schedule)
+    {
+        if (int.TryParse(activeKey, out int dayOfWeek) && int.TryParse(_selectedValue, out int seasonId))
+        {
+            var option = new AnimeCollectOption
+                {
+                    AnimeId = schedule.AnimeId,
+                    SeasonId = seasonId,
+                    DayOfWeek = dayOfWeek,
+                    IsCollect = !schedule.IsCollected
+                };
+
+            var data = await api.AnimeCollectToggle(option);
+            if (true == data?.IsSuccess) schedule.IsCollected = !schedule.IsCollected;
         }
     }
 }

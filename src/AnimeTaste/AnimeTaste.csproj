@@ -13,6 +13,7 @@
 		<PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="9.0.70" />
+		<PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.3.0" />
 		<PackageReference Include="SqlSugarCore" Version="5.1.4.193" />
 	</ItemGroup>
 
